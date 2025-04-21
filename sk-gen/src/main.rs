@@ -124,7 +124,9 @@ const GPU_MODEL_STRING: &str = "nvidia.com/gpu";
 
 const SCALE_ACTION_PROBABILITY: f64 = 0.8;
 const CREATE_DELETE_ACTION_PROBABILITY: f64 = 0.1;
-const RESOURCE_ACTION_PROBABILITY: f64 = 0.1;
+const RESOURCE_ACTION_CPU_PROBABILITY: f64 = 0.14;
+const RESOURCE_ACTION_MEMORY_PROBABILITY: f64 = 0.86;
+const RESOURCE_ACTION_GPU_PROBABILITY: f64 = 0.0;
 
 // the clap crate allows us to define a CLI interface using a struct and some #[attributes]
 /// `sk-gen` is a CLI tool for generating synthetic trace data which is ingestible by SimKube.
@@ -837,7 +839,9 @@ impl ClusterGraph {
                             DeploymentAction::CreateDeployment | DeploymentAction::DeleteDeployment => {
                                 CREATE_DELETE_ACTION_PROBABILITY
                             },
-                            DeploymentAction::ResourceAction { .. } => RESOURCE_ACTION_PROBABILITY,
+                            DeploymentAction::ResourceAction { action:ResourceAction::Cpu(_),.. } => {RESOURCE_ACTION_CPU_PROBABILITY},
+                            DeploymentAction::ResourceAction { action:ResourceAction::Memory(_),.. } => {RESOURCE_ACTION_MEMORY_PROBABILITY}, 
+                            DeploymentAction::ResourceAction { action:ResourceAction::Gpu(_),.. } => {RESOURCE_ACTION_GPU_PROBABILITY}
                         }
                     })
                     .collect();
