@@ -1,0 +1,2401 @@
+{
+  "version": 2,
+  "config": {
+    "trackedObjects": {
+      "apps/v1.Deployment": {
+        "podSpecTemplatePath": "/spec/template"
+      }
+    }
+  },
+  "events": [
+    {
+      "ts": 1710892138,
+      "applied_objs": [],
+      "deleted_objs": []
+    },
+    {
+      "ts": 1710892138,
+      "applied_objs": [
+        {
+          "apiVersion": "apps/v1",
+          "kind": "Deployment",
+          "metadata": {
+            "annotations": {
+              "meta.helm.sh/release-name": "dsb-social-network",
+              "meta.helm.sh/release-namespace": "dsb"
+            },
+            "labels": {
+              "app.kubernetes.io/managed-by": "Helm",
+              "service": "compose-post-service"
+            },
+            "name": "compose-post-service",
+            "namespace": "dsb"
+          },
+          "spec": {
+            "replicas": 1,
+            "selector": {
+              "matchLabels": {
+                "service": "compose-post-service"
+              }
+            },
+            "template": {
+              "metadata": {
+                "creationTimestamp": null,
+                "labels": {
+                  "app": "compose-post-service",
+                  "service": "compose-post-service"
+                }
+              },
+              "spec": {
+                "volumes": [
+                  {
+                    "name": "compose-post-service-config",
+                    "configMap": {
+                      "name": "compose-post-service",
+                      "defaultMode": 420
+                    }
+                  }
+                ],
+                "containers": [
+                  {
+                    "name": "compose-post-service",
+                    "image": "docker.io/deathstarbench/social-network-microservices:latest",
+                    "command": [
+                      "ComposePostService"
+                    ],
+                    "ports": [
+                      {
+                        "containerPort": 9090,
+                        "protocol": "TCP"
+                      }
+                    ],
+                    "resources": {
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "1Gi"
+                      }
+                    },
+                    "volumeMounts": [
+                      {
+                        "name": "compose-post-service-config",
+                        "mountPath": "/social-network-microservices/config/jaeger-config.yml",
+                        "subPath": "jaeger-config.yml"
+                      },
+                      {
+                        "name": "compose-post-service-config",
+                        "mountPath": "/social-network-microservices/config/service-config.json",
+                        "subPath": "service-config.json"
+                      }
+                    ],
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "imagePullPolicy": "IfNotPresent"
+                  }
+                ],
+                "restartPolicy": "Always",
+                "terminationGracePeriodSeconds": 30,
+                "dnsPolicy": "ClusterFirst",
+                "securityContext": {},
+                "hostname": "compose-post-service",
+                "schedulerName": "default-scheduler"
+              }
+            },
+            "strategy": {
+              "type": "RollingUpdate",
+              "rollingUpdate": {
+                "maxUnavailable": "25%",
+                "maxSurge": "25%"
+              }
+            },
+            "revisionHistoryLimit": 10,
+            "progressDeadlineSeconds": 600
+          },
+          "status": {}
+        },
+        {
+          "apiVersion": "apps/v1",
+          "kind": "Deployment",
+          "metadata": {
+            "annotations": {
+              "meta.helm.sh/release-name": "dsb-social-network",
+              "meta.helm.sh/release-namespace": "dsb"
+            },
+            "labels": {
+              "app.kubernetes.io/managed-by": "Helm",
+              "service": "text-service"
+            },
+            "name": "text-service",
+            "namespace": "dsb"
+          },
+          "spec": {
+            "replicas": 1,
+            "selector": {
+              "matchLabels": {
+                "service": "text-service"
+              }
+            },
+            "template": {
+              "metadata": {
+                "creationTimestamp": null,
+                "labels": {
+                  "app": "text-service",
+                  "service": "text-service"
+                }
+              },
+              "spec": {
+                "volumes": [
+                  {
+                    "name": "text-service-config",
+                    "configMap": {
+                      "name": "text-service",
+                      "defaultMode": 420
+                    }
+                  }
+                ],
+                "containers": [
+                  {
+                    "name": "text-service",
+                    "image": "docker.io/deathstarbench/social-network-microservices:latest",
+                    "command": [
+                      "TextService"
+                    ],
+                    "ports": [
+                      {
+                        "containerPort": 9090,
+                        "protocol": "TCP"
+                      }
+                    ],
+                    "resources": {
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "1Gi"
+                      }
+                    },
+                    "volumeMounts": [
+                      {
+                        "name": "text-service-config",
+                        "mountPath": "/social-network-microservices/config/jaeger-config.yml",
+                        "subPath": "jaeger-config.yml"
+                      },
+                      {
+                        "name": "text-service-config",
+                        "mountPath": "/social-network-microservices/config/service-config.json",
+                        "subPath": "service-config.json"
+                      }
+                    ],
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "imagePullPolicy": "IfNotPresent"
+                  }
+                ],
+                "restartPolicy": "Always",
+                "terminationGracePeriodSeconds": 30,
+                "dnsPolicy": "ClusterFirst",
+                "securityContext": {},
+                "hostname": "text-service",
+                "schedulerName": "default-scheduler"
+              }
+            },
+            "strategy": {
+              "type": "RollingUpdate",
+              "rollingUpdate": {
+                "maxUnavailable": "25%",
+                "maxSurge": "25%"
+              }
+            },
+            "revisionHistoryLimit": 10,
+            "progressDeadlineSeconds": 600
+          },
+          "status": {}
+        },
+        {
+          "apiVersion": "apps/v1",
+          "kind": "Deployment",
+          "metadata": {
+            "annotations": {
+              "meta.helm.sh/release-name": "dsb-social-network",
+              "meta.helm.sh/release-namespace": "dsb"
+            },
+            "labels": {
+              "app.kubernetes.io/managed-by": "Helm",
+              "service": "post-storage-service"
+            },
+            "name": "post-storage-service",
+            "namespace": "dsb"
+          },
+          "spec": {
+            "replicas": 1,
+            "selector": {
+              "matchLabels": {
+                "service": "post-storage-service"
+              }
+            },
+            "template": {
+              "metadata": {
+                "creationTimestamp": null,
+                "labels": {
+                  "app": "post-storage-service",
+                  "service": "post-storage-service"
+                }
+              },
+              "spec": {
+                "volumes": [
+                  {
+                    "name": "post-storage-service-config",
+                    "configMap": {
+                      "name": "post-storage-service",
+                      "defaultMode": 420
+                    }
+                  }
+                ],
+                "containers": [
+                  {
+                    "name": "post-storage-service",
+                    "image": "docker.io/deathstarbench/social-network-microservices:latest",
+                    "command": [
+                      "PostStorageService"
+                    ],
+                    "ports": [
+                      {
+                        "containerPort": 9090,
+                        "protocol": "TCP"
+                      }
+                    ],
+                    "resources": {
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "1Gi"
+                      }
+                    },
+                    "volumeMounts": [
+                      {
+                        "name": "post-storage-service-config",
+                        "mountPath": "/social-network-microservices/config/jaeger-config.yml",
+                        "subPath": "jaeger-config.yml"
+                      },
+                      {
+                        "name": "post-storage-service-config",
+                        "mountPath": "/social-network-microservices/config/service-config.json",
+                        "subPath": "service-config.json"
+                      }
+                    ],
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "imagePullPolicy": "IfNotPresent"
+                  }
+                ],
+                "restartPolicy": "Always",
+                "terminationGracePeriodSeconds": 30,
+                "dnsPolicy": "ClusterFirst",
+                "securityContext": {},
+                "hostname": "post-storage-service",
+                "schedulerName": "default-scheduler"
+              }
+            },
+            "strategy": {
+              "type": "RollingUpdate",
+              "rollingUpdate": {
+                "maxUnavailable": "25%",
+                "maxSurge": "25%"
+              }
+            },
+            "revisionHistoryLimit": 10,
+            "progressDeadlineSeconds": 600
+          },
+          "status": {}
+        },
+        {
+          "apiVersion": "apps/v1",
+          "kind": "Deployment",
+          "metadata": {
+            "annotations": {
+              "meta.helm.sh/release-name": "dsb-social-network",
+              "meta.helm.sh/release-namespace": "dsb"
+            },
+            "labels": {
+              "app.kubernetes.io/managed-by": "Helm",
+              "service": "nginx-thrift"
+            },
+            "name": "nginx-thrift",
+            "namespace": "dsb"
+          },
+          "spec": {
+            "replicas": 1,
+            "selector": {
+              "matchLabels": {
+                "service": "nginx-thrift"
+              }
+            },
+            "template": {
+              "metadata": {
+                "creationTimestamp": null,
+                "labels": {
+                  "app": "nginx-thrift",
+                  "service": "nginx-thrift"
+                }
+              },
+              "spec": {
+                "volumes": [
+                  {
+                    "name": "nginx-thrift-config",
+                    "configMap": {
+                      "name": "nginx-thrift",
+                      "defaultMode": 420
+                    }
+                  },
+                  {
+                    "name": "lua-scripts",
+                    "emptyDir": {}
+                  },
+                  {
+                    "name": "pages",
+                    "emptyDir": {}
+                  },
+                  {
+                    "name": "gen-lua",
+                    "emptyDir": {}
+                  },
+                  {
+                    "name": "lua-thrift",
+                    "emptyDir": {}
+                  },
+                  {
+                    "name": "keys",
+                    "emptyDir": {}
+                  }
+                ],
+                "initContainers": [
+                  {
+                    "name": "alpine-container",
+                    "image": "docker.io/alpine/git:latest",
+                    "command": [
+                      "/bin/sh"
+                    ],
+                    "args": [
+                      "-c",
+                      "git clone https://github.com/delimitrou/DeathStarBench.git /DeathStarBench && cp -r /DeathStarBench/socialNetwork/gen-lua/* /gen-lua/ && cp -r /DeathStarBench/socialNetwork/docker/openresty-thrift/lua-thrift/* /lua-thrift/ && cp -r /DeathStarBench/socialNetwork/nginx-web-server/lua-scripts/* /lua-scripts/ && cp -r /DeathStarBench/socialNetwork/nginx-web-server/pages/* /pages/ && cp /DeathStarBench/socialNetwork/keys/* /keys/"
+                    ],
+                    "resources": {
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "1Gi"
+                      }
+                    },
+                    "volumeMounts": [
+                      {
+                        "name": "lua-scripts",
+                        "mountPath": "/lua-scripts"
+                      },
+                      {
+                        "name": "lua-thrift",
+                        "mountPath": "/lua-thrift"
+                      },
+                      {
+                        "name": "pages",
+                        "mountPath": "/pages"
+                      },
+                      {
+                        "name": "gen-lua",
+                        "mountPath": "/gen-lua"
+                      },
+                      {
+                        "name": "keys",
+                        "mountPath": "/keys"
+                      }
+                    ],
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "imagePullPolicy": "IfNotPresent"
+                  }
+                ],
+                "containers": [
+                  {
+                    "name": "nginx-thrift",
+                    "image": "docker.io/yg397/openresty-thrift:xenial",
+                    "ports": [
+                      {
+                        "containerPort": 8080,
+                        "protocol": "TCP"
+                      }
+                    ],
+                    "env": [
+                      {
+                        "name": "fqdn_suffix",
+                        "value": ".dsb.svc.cluster.local"
+                      }
+                    ],
+                    "resources": {
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "1Gi"
+                      }
+                    },
+                    "volumeMounts": [
+                      {
+                        "name": "nginx-thrift-config",
+                        "mountPath": "/usr/local/openresty/nginx/jaeger-config.json",
+                        "subPath": "jaeger-config.json"
+                      },
+                      {
+                        "name": "nginx-thrift-config",
+                        "mountPath": "/usr/local/openresty/nginx/conf/nginx.conf",
+                        "subPath": "nginx.conf"
+                      },
+                      {
+                        "name": "lua-scripts",
+                        "mountPath": "/usr/local/openresty/nginx/lua-scripts"
+                      },
+                      {
+                        "name": "lua-thrift",
+                        "mountPath": "/usr/local/openresty/lualib/thrift"
+                      },
+                      {
+                        "name": "pages",
+                        "mountPath": "/usr/local/openresty/nginx/pages"
+                      },
+                      {
+                        "name": "gen-lua",
+                        "mountPath": "/gen-lua"
+                      },
+                      {
+                        "name": "keys",
+                        "mountPath": "/keys"
+                      }
+                    ],
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "imagePullPolicy": "IfNotPresent"
+                  }
+                ],
+                "restartPolicy": "Always",
+                "terminationGracePeriodSeconds": 30,
+                "dnsPolicy": "ClusterFirst",
+                "securityContext": {},
+                "hostname": "nginx-thrift",
+                "schedulerName": "default-scheduler"
+              }
+            },
+            "strategy": {
+              "type": "RollingUpdate",
+              "rollingUpdate": {
+                "maxUnavailable": "25%",
+                "maxSurge": "25%"
+              }
+            },
+            "revisionHistoryLimit": 10,
+            "progressDeadlineSeconds": 600
+          },
+          "status": {}
+        }
+      ],
+      "deleted_objs": []
+    },
+    {
+      "ts": 1710892561,
+      "applied_objs": [],
+      "deleted_objs": []
+    },
+    {
+      "ts": 1710892686,
+      "applied_objs": [
+        {
+          "apiVersion": "apps/v1",
+          "kind": "Deployment",
+          "metadata": {
+            "annotations": {
+              "meta.helm.sh/release-name": "dsb-social-network",
+              "meta.helm.sh/release-namespace": "dsb"
+            },
+            "labels": {
+              "app.kubernetes.io/managed-by": "Helm",
+              "service": "compose-post-service"
+            },
+            "name": "compose-post-service",
+            "namespace": "dsb"
+          },
+          "spec": {
+            "replicas": 4,
+            "selector": {
+              "matchLabels": {
+                "service": "compose-post-service"
+              }
+            },
+            "template": {
+              "metadata": {
+                "creationTimestamp": null,
+                "labels": {
+                  "app": "compose-post-service",
+                  "service": "compose-post-service"
+                }
+              },
+              "spec": {
+                "volumes": [
+                  {
+                    "name": "compose-post-service-config",
+                    "configMap": {
+                      "name": "compose-post-service",
+                      "defaultMode": 420
+                    }
+                  }
+                ],
+                "containers": [
+                  {
+                    "name": "compose-post-service",
+                    "image": "docker.io/deathstarbench/social-network-microservices:latest",
+                    "command": [
+                      "ComposePostService"
+                    ],
+                    "ports": [
+                      {
+                        "containerPort": 9090,
+                        "protocol": "TCP"
+                      }
+                    ],
+                    "resources": {
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "1Gi"
+                      }
+                    },
+                    "volumeMounts": [
+                      {
+                        "name": "compose-post-service-config",
+                        "mountPath": "/social-network-microservices/config/jaeger-config.yml",
+                        "subPath": "jaeger-config.yml"
+                      },
+                      {
+                        "name": "compose-post-service-config",
+                        "mountPath": "/social-network-microservices/config/service-config.json",
+                        "subPath": "service-config.json"
+                      }
+                    ],
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "imagePullPolicy": "IfNotPresent"
+                  }
+                ],
+                "restartPolicy": "Always",
+                "terminationGracePeriodSeconds": 30,
+                "dnsPolicy": "ClusterFirst",
+                "securityContext": {},
+                "hostname": "compose-post-service",
+                "schedulerName": "default-scheduler"
+              }
+            },
+            "strategy": {
+              "type": "RollingUpdate",
+              "rollingUpdate": {
+                "maxUnavailable": "25%",
+                "maxSurge": "25%"
+              }
+            },
+            "revisionHistoryLimit": 10,
+            "progressDeadlineSeconds": 600
+          },
+          "status": {
+            "observedGeneration": 1,
+            "replicas": 1,
+            "updatedReplicas": 1,
+            "readyReplicas": 1,
+            "availableReplicas": 1,
+            "conditions": [
+              {
+                "type": "Available",
+                "status": "True",
+                "lastUpdateTime": "2024-03-19T23:49:02Z",
+                "lastTransitionTime": "2024-03-19T23:49:02Z",
+                "reason": "MinimumReplicasAvailable",
+                "message": "Deployment has minimum availability."
+              },
+              {
+                "type": "Progressing",
+                "status": "True",
+                "lastUpdateTime": "2024-03-19T23:49:02Z",
+                "lastTransitionTime": "2024-03-19T23:48:58Z",
+                "reason": "NewReplicaSetAvailable",
+                "message": "ReplicaSet \"compose-post-service-84d56c9dcb\" has successfully progressed."
+              }
+            ]
+          }
+        }
+      ],
+      "deleted_objs": []
+    },
+    {
+      "ts": 1710892689,
+      "applied_objs": [],
+      "deleted_objs": []
+    },
+    {
+      "ts": 1710892691,
+      "applied_objs": [
+        {
+          "apiVersion": "apps/v1",
+          "kind": "Deployment",
+          "metadata": {
+            "annotations": {
+              "meta.helm.sh/release-name": "dsb-social-network",
+              "meta.helm.sh/release-namespace": "dsb"
+            },
+            "labels": {
+              "app.kubernetes.io/managed-by": "Helm",
+              "service": "text-service"
+            },
+            "name": "text-service",
+            "namespace": "dsb"
+          },
+          "spec": {
+            "replicas": 3,
+            "selector": {
+              "matchLabels": {
+                "service": "text-service"
+              }
+            },
+            "template": {
+              "metadata": {
+                "creationTimestamp": null,
+                "labels": {
+                  "app": "text-service",
+                  "service": "text-service"
+                }
+              },
+              "spec": {
+                "volumes": [
+                  {
+                    "name": "text-service-config",
+                    "configMap": {
+                      "name": "text-service",
+                      "defaultMode": 420
+                    }
+                  }
+                ],
+                "containers": [
+                  {
+                    "name": "text-service",
+                    "image": "docker.io/deathstarbench/social-network-microservices:latest",
+                    "command": [
+                      "TextService"
+                    ],
+                    "ports": [
+                      {
+                        "containerPort": 9090,
+                        "protocol": "TCP"
+                      }
+                    ],
+                    "resources": {
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "1Gi"
+                      }
+                    },
+                    "volumeMounts": [
+                      {
+                        "name": "text-service-config",
+                        "mountPath": "/social-network-microservices/config/jaeger-config.yml",
+                        "subPath": "jaeger-config.yml"
+                      },
+                      {
+                        "name": "text-service-config",
+                        "mountPath": "/social-network-microservices/config/service-config.json",
+                        "subPath": "service-config.json"
+                      }
+                    ],
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "imagePullPolicy": "IfNotPresent"
+                  }
+                ],
+                "restartPolicy": "Always",
+                "terminationGracePeriodSeconds": 30,
+                "dnsPolicy": "ClusterFirst",
+                "securityContext": {},
+                "hostname": "text-service",
+                "schedulerName": "default-scheduler"
+              }
+            },
+            "strategy": {
+              "type": "RollingUpdate",
+              "rollingUpdate": {
+                "maxUnavailable": "25%",
+                "maxSurge": "25%"
+              }
+            },
+            "revisionHistoryLimit": 10,
+            "progressDeadlineSeconds": 600
+          },
+          "status": {
+            "observedGeneration": 1,
+            "replicas": 1,
+            "updatedReplicas": 1,
+            "readyReplicas": 1,
+            "availableReplicas": 1,
+            "conditions": [
+              {
+                "type": "Available",
+                "status": "True",
+                "lastUpdateTime": "2024-03-19T23:49:02Z",
+                "lastTransitionTime": "2024-03-19T23:49:02Z",
+                "reason": "MinimumReplicasAvailable",
+                "message": "Deployment has minimum availability."
+              },
+              {
+                "type": "Progressing",
+                "status": "True",
+                "lastUpdateTime": "2024-03-19T23:49:02Z",
+                "lastTransitionTime": "2024-03-19T23:49:00Z",
+                "reason": "NewReplicaSetAvailable",
+                "message": "ReplicaSet \"text-service-84dc55fcd7\" has successfully progressed."
+              }
+            ]
+          }
+        }
+      ],
+      "deleted_objs": []
+    },
+    {
+      "ts": 1710892694,
+      "applied_objs": [
+        {
+          "apiVersion": "apps/v1",
+          "kind": "Deployment",
+          "metadata": {
+            "annotations": {
+              "meta.helm.sh/release-name": "dsb-social-network",
+              "meta.helm.sh/release-namespace": "dsb"
+            },
+            "labels": {
+              "app.kubernetes.io/managed-by": "Helm",
+              "service": "nginx-thrift"
+            },
+            "name": "nginx-thrift",
+            "namespace": "dsb"
+          },
+          "spec": {
+            "replicas": 2,
+            "selector": {
+              "matchLabels": {
+                "service": "nginx-thrift"
+              }
+            },
+            "template": {
+              "metadata": {
+                "creationTimestamp": null,
+                "labels": {
+                  "app": "nginx-thrift",
+                  "service": "nginx-thrift"
+                }
+              },
+              "spec": {
+                "volumes": [
+                  {
+                    "name": "nginx-thrift-config",
+                    "configMap": {
+                      "name": "nginx-thrift",
+                      "defaultMode": 420
+                    }
+                  },
+                  {
+                    "name": "lua-scripts",
+                    "emptyDir": {}
+                  },
+                  {
+                    "name": "pages",
+                    "emptyDir": {}
+                  },
+                  {
+                    "name": "gen-lua",
+                    "emptyDir": {}
+                  },
+                  {
+                    "name": "lua-thrift",
+                    "emptyDir": {}
+                  },
+                  {
+                    "name": "keys",
+                    "emptyDir": {}
+                  }
+                ],
+                "initContainers": [
+                  {
+                    "name": "alpine-container",
+                    "image": "docker.io/alpine/git:latest",
+                    "command": [
+                      "/bin/sh"
+                    ],
+                    "args": [
+                      "-c",
+                      "git clone https://github.com/delimitrou/DeathStarBench.git /DeathStarBench && cp -r /DeathStarBench/socialNetwork/gen-lua/* /gen-lua/ && cp -r /DeathStarBench/socialNetwork/docker/openresty-thrift/lua-thrift/* /lua-thrift/ && cp -r /DeathStarBench/socialNetwork/nginx-web-server/lua-scripts/* /lua-scripts/ && cp -r /DeathStarBench/socialNetwork/nginx-web-server/pages/* /pages/ && cp /DeathStarBench/socialNetwork/keys/* /keys/"
+                    ],
+                    "resources": {
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "1Gi"
+                      }
+                    },
+                    "volumeMounts": [
+                      {
+                        "name": "lua-scripts",
+                        "mountPath": "/lua-scripts"
+                      },
+                      {
+                        "name": "lua-thrift",
+                        "mountPath": "/lua-thrift"
+                      },
+                      {
+                        "name": "pages",
+                        "mountPath": "/pages"
+                      },
+                      {
+                        "name": "gen-lua",
+                        "mountPath": "/gen-lua"
+                      },
+                      {
+                        "name": "keys",
+                        "mountPath": "/keys"
+                      }
+                    ],
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "imagePullPolicy": "IfNotPresent"
+                  }
+                ],
+                "containers": [
+                  {
+                    "name": "nginx-thrift",
+                    "image": "docker.io/yg397/openresty-thrift:xenial",
+                    "ports": [
+                      {
+                        "containerPort": 8080,
+                        "protocol": "TCP"
+                      }
+                    ],
+                    "env": [
+                      {
+                        "name": "fqdn_suffix",
+                        "value": ".dsb.svc.cluster.local"
+                      }
+                    ],
+                    "resources": {
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "1Gi"
+                      }
+                    },
+                    "volumeMounts": [
+                      {
+                        "name": "nginx-thrift-config",
+                        "mountPath": "/usr/local/openresty/nginx/jaeger-config.json",
+                        "subPath": "jaeger-config.json"
+                      },
+                      {
+                        "name": "nginx-thrift-config",
+                        "mountPath": "/usr/local/openresty/nginx/conf/nginx.conf",
+                        "subPath": "nginx.conf"
+                      },
+                      {
+                        "name": "lua-scripts",
+                        "mountPath": "/usr/local/openresty/nginx/lua-scripts"
+                      },
+                      {
+                        "name": "lua-thrift",
+                        "mountPath": "/usr/local/openresty/lualib/thrift"
+                      },
+                      {
+                        "name": "pages",
+                        "mountPath": "/usr/local/openresty/nginx/pages"
+                      },
+                      {
+                        "name": "gen-lua",
+                        "mountPath": "/gen-lua"
+                      },
+                      {
+                        "name": "keys",
+                        "mountPath": "/keys"
+                      }
+                    ],
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "imagePullPolicy": "IfNotPresent"
+                  }
+                ],
+                "restartPolicy": "Always",
+                "terminationGracePeriodSeconds": 30,
+                "dnsPolicy": "ClusterFirst",
+                "securityContext": {},
+                "hostname": "nginx-thrift",
+                "schedulerName": "default-scheduler"
+              }
+            },
+            "strategy": {
+              "type": "RollingUpdate",
+              "rollingUpdate": {
+                "maxUnavailable": "25%",
+                "maxSurge": "25%"
+              }
+            },
+            "revisionHistoryLimit": 10,
+            "progressDeadlineSeconds": 600
+          },
+          "status": {
+            "observedGeneration": 1,
+            "replicas": 1,
+            "updatedReplicas": 1,
+            "readyReplicas": 1,
+            "availableReplicas": 1,
+            "conditions": [
+              {
+                "type": "Available",
+                "status": "True",
+                "lastUpdateTime": "2024-03-19T23:49:10Z",
+                "lastTransitionTime": "2024-03-19T23:49:10Z",
+                "reason": "MinimumReplicasAvailable",
+                "message": "Deployment has minimum availability."
+              },
+              {
+                "type": "Progressing",
+                "status": "True",
+                "lastUpdateTime": "2024-03-19T23:49:10Z",
+                "lastTransitionTime": "2024-03-19T23:49:01Z",
+                "reason": "NewReplicaSetAvailable",
+                "message": "ReplicaSet \"nginx-thrift-6d87b5777c\" has successfully progressed."
+              }
+            ]
+          }
+        }
+      ],
+      "deleted_objs": []
+    },
+    {
+      "ts": 1710892701,
+      "applied_objs": [
+        {
+          "apiVersion": "apps/v1",
+          "kind": "Deployment",
+          "metadata": {
+            "annotations": {
+              "meta.helm.sh/release-name": "dsb-social-network",
+              "meta.helm.sh/release-namespace": "dsb"
+            },
+            "labels": {
+              "app.kubernetes.io/managed-by": "Helm",
+              "service": "compose-post-service"
+            },
+            "name": "compose-post-service",
+            "namespace": "dsb"
+          },
+          "spec": {
+            "replicas": 6,
+            "selector": {
+              "matchLabels": {
+                "service": "compose-post-service"
+              }
+            },
+            "template": {
+              "metadata": {
+                "creationTimestamp": null,
+                "labels": {
+                  "app": "compose-post-service",
+                  "service": "compose-post-service"
+                }
+              },
+              "spec": {
+                "volumes": [
+                  {
+                    "name": "compose-post-service-config",
+                    "configMap": {
+                      "name": "compose-post-service",
+                      "defaultMode": 420
+                    }
+                  }
+                ],
+                "containers": [
+                  {
+                    "name": "compose-post-service",
+                    "image": "docker.io/deathstarbench/social-network-microservices:latest",
+                    "command": [
+                      "ComposePostService"
+                    ],
+                    "ports": [
+                      {
+                        "containerPort": 9090,
+                        "protocol": "TCP"
+                      }
+                    ],
+                    "resources": {
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "1Gi"
+                      }
+                    },
+                    "volumeMounts": [
+                      {
+                        "name": "compose-post-service-config",
+                        "mountPath": "/social-network-microservices/config/jaeger-config.yml",
+                        "subPath": "jaeger-config.yml"
+                      },
+                      {
+                        "name": "compose-post-service-config",
+                        "mountPath": "/social-network-microservices/config/service-config.json",
+                        "subPath": "service-config.json"
+                      }
+                    ],
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "imagePullPolicy": "IfNotPresent"
+                  }
+                ],
+                "restartPolicy": "Always",
+                "terminationGracePeriodSeconds": 30,
+                "dnsPolicy": "ClusterFirst",
+                "securityContext": {},
+                "hostname": "compose-post-service",
+                "schedulerName": "default-scheduler"
+              }
+            },
+            "strategy": {
+              "type": "RollingUpdate",
+              "rollingUpdate": {
+                "maxUnavailable": "25%",
+                "maxSurge": "25%"
+              }
+            },
+            "revisionHistoryLimit": 10,
+            "progressDeadlineSeconds": 600
+          },
+          "status": {
+            "observedGeneration": 2,
+            "replicas": 4,
+            "updatedReplicas": 4,
+            "readyReplicas": 2,
+            "availableReplicas": 2,
+            "unavailableReplicas": 2,
+            "conditions": [
+              {
+                "type": "Progressing",
+                "status": "True",
+                "lastUpdateTime": "2024-03-19T23:49:02Z",
+                "lastTransitionTime": "2024-03-19T23:48:58Z",
+                "reason": "NewReplicaSetAvailable",
+                "message": "ReplicaSet \"compose-post-service-84d56c9dcb\" has successfully progressed."
+              },
+              {
+                "type": "Available",
+                "status": "False",
+                "lastUpdateTime": "2024-03-19T23:58:06Z",
+                "lastTransitionTime": "2024-03-19T23:58:06Z",
+                "reason": "MinimumReplicasUnavailable",
+                "message": "Deployment does not have minimum availability."
+              }
+            ]
+          }
+        }
+      ],
+      "deleted_objs": []
+    },
+    {
+      "ts": 1710892721,
+      "applied_objs": [
+        {
+          "apiVersion": "apps/v1",
+          "kind": "Deployment",
+          "metadata": {
+            "annotations": {
+              "meta.helm.sh/release-name": "dsb-social-network",
+              "meta.helm.sh/release-namespace": "dsb"
+            },
+            "labels": {
+              "app.kubernetes.io/managed-by": "Helm",
+              "service": "text-service"
+            },
+            "name": "text-service",
+            "namespace": "dsb"
+          },
+          "spec": {
+            "replicas": 5,
+            "selector": {
+              "matchLabels": {
+                "service": "text-service"
+              }
+            },
+            "template": {
+              "metadata": {
+                "creationTimestamp": null,
+                "labels": {
+                  "app": "text-service",
+                  "service": "text-service"
+                }
+              },
+              "spec": {
+                "volumes": [
+                  {
+                    "name": "text-service-config",
+                    "configMap": {
+                      "name": "text-service",
+                      "defaultMode": 420
+                    }
+                  }
+                ],
+                "containers": [
+                  {
+                    "name": "text-service",
+                    "image": "docker.io/deathstarbench/social-network-microservices:latest",
+                    "command": [
+                      "TextService"
+                    ],
+                    "ports": [
+                      {
+                        "containerPort": 9090,
+                        "protocol": "TCP"
+                      }
+                    ],
+                    "resources": {
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "1Gi"
+                      }
+                    },
+                    "volumeMounts": [
+                      {
+                        "name": "text-service-config",
+                        "mountPath": "/social-network-microservices/config/jaeger-config.yml",
+                        "subPath": "jaeger-config.yml"
+                      },
+                      {
+                        "name": "text-service-config",
+                        "mountPath": "/social-network-microservices/config/service-config.json",
+                        "subPath": "service-config.json"
+                      }
+                    ],
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "imagePullPolicy": "IfNotPresent"
+                  }
+                ],
+                "restartPolicy": "Always",
+                "terminationGracePeriodSeconds": 30,
+                "dnsPolicy": "ClusterFirst",
+                "securityContext": {},
+                "hostname": "text-service",
+                "schedulerName": "default-scheduler"
+              }
+            },
+            "strategy": {
+              "type": "RollingUpdate",
+              "rollingUpdate": {
+                "maxUnavailable": "25%",
+                "maxSurge": "25%"
+              }
+            },
+            "revisionHistoryLimit": 10,
+            "progressDeadlineSeconds": 600
+          },
+          "status": {
+            "observedGeneration": 2,
+            "replicas": 3,
+            "updatedReplicas": 3,
+            "readyReplicas": 1,
+            "availableReplicas": 1,
+            "unavailableReplicas": 2,
+            "conditions": [
+              {
+                "type": "Progressing",
+                "status": "True",
+                "lastUpdateTime": "2024-03-19T23:49:02Z",
+                "lastTransitionTime": "2024-03-19T23:49:00Z",
+                "reason": "NewReplicaSetAvailable",
+                "message": "ReplicaSet \"text-service-84dc55fcd7\" has successfully progressed."
+              },
+              {
+                "type": "Available",
+                "status": "False",
+                "lastUpdateTime": "2024-03-19T23:58:11Z",
+                "lastTransitionTime": "2024-03-19T23:58:11Z",
+                "reason": "MinimumReplicasUnavailable",
+                "message": "Deployment does not have minimum availability."
+              }
+            ]
+          }
+        }
+      ],
+      "deleted_objs": []
+    },
+    {
+      "ts": 1710892906,
+      "applied_objs": [],
+      "deleted_objs": []
+    },
+    {
+      "ts": 1710892927,
+      "applied_objs": [
+        {
+          "apiVersion": "apps/v1",
+          "kind": "Deployment",
+          "metadata": {
+            "annotations": {
+              "meta.helm.sh/release-name": "dsb-social-network",
+              "meta.helm.sh/release-namespace": "dsb"
+            },
+            "labels": {
+              "app.kubernetes.io/managed-by": "Helm",
+              "service": "post-storage-service"
+            },
+            "name": "post-storage-service",
+            "namespace": "dsb"
+          },
+          "spec": {
+            "replicas": 3,
+            "selector": {
+              "matchLabels": {
+                "service": "post-storage-service"
+              }
+            },
+            "template": {
+              "metadata": {
+                "creationTimestamp": null,
+                "labels": {
+                  "app": "post-storage-service",
+                  "service": "post-storage-service"
+                }
+              },
+              "spec": {
+                "volumes": [
+                  {
+                    "name": "post-storage-service-config",
+                    "configMap": {
+                      "name": "post-storage-service",
+                      "defaultMode": 420
+                    }
+                  }
+                ],
+                "containers": [
+                  {
+                    "name": "post-storage-service",
+                    "image": "docker.io/deathstarbench/social-network-microservices:latest",
+                    "command": [
+                      "PostStorageService"
+                    ],
+                    "ports": [
+                      {
+                        "containerPort": 9090,
+                        "protocol": "TCP"
+                      }
+                    ],
+                    "resources": {
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "1Gi"
+                      }
+                    },
+                    "volumeMounts": [
+                      {
+                        "name": "post-storage-service-config",
+                        "mountPath": "/social-network-microservices/config/jaeger-config.yml",
+                        "subPath": "jaeger-config.yml"
+                      },
+                      {
+                        "name": "post-storage-service-config",
+                        "mountPath": "/social-network-microservices/config/service-config.json",
+                        "subPath": "service-config.json"
+                      }
+                    ],
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "imagePullPolicy": "IfNotPresent"
+                  }
+                ],
+                "restartPolicy": "Always",
+                "terminationGracePeriodSeconds": 30,
+                "dnsPolicy": "ClusterFirst",
+                "securityContext": {},
+                "hostname": "post-storage-service",
+                "schedulerName": "default-scheduler"
+              }
+            },
+            "strategy": {
+              "type": "RollingUpdate",
+              "rollingUpdate": {
+                "maxUnavailable": "25%",
+                "maxSurge": "25%"
+              }
+            },
+            "revisionHistoryLimit": 10,
+            "progressDeadlineSeconds": 600
+          },
+          "status": {
+            "observedGeneration": 1,
+            "replicas": 1,
+            "updatedReplicas": 1,
+            "readyReplicas": 1,
+            "availableReplicas": 1,
+            "conditions": [
+              {
+                "type": "Available",
+                "status": "True",
+                "lastUpdateTime": "2024-03-19T23:49:04Z",
+                "lastTransitionTime": "2024-03-19T23:49:04Z",
+                "reason": "MinimumReplicasAvailable",
+                "message": "Deployment has minimum availability."
+              },
+              {
+                "type": "Progressing",
+                "status": "True",
+                "lastUpdateTime": "2024-03-19T23:49:04Z",
+                "lastTransitionTime": "2024-03-19T23:49:01Z",
+                "reason": "NewReplicaSetAvailable",
+                "message": "ReplicaSet \"post-storage-service-5685dffb9\" has successfully progressed."
+              }
+            ]
+          }
+        }
+      ],
+      "deleted_objs": []
+    },
+    {
+      "ts": 1710892935,
+      "applied_objs": [
+        {
+          "apiVersion": "apps/v1",
+          "kind": "Deployment",
+          "metadata": {
+            "annotations": {
+              "meta.helm.sh/release-name": "dsb-social-network",
+              "meta.helm.sh/release-namespace": "dsb"
+            },
+            "labels": {
+              "app.kubernetes.io/managed-by": "Helm",
+              "service": "nginx-thrift"
+            },
+            "name": "nginx-thrift",
+            "namespace": "dsb"
+          },
+          "spec": {
+            "replicas": 4,
+            "selector": {
+              "matchLabels": {
+                "service": "nginx-thrift"
+              }
+            },
+            "template": {
+              "metadata": {
+                "creationTimestamp": null,
+                "labels": {
+                  "app": "nginx-thrift",
+                  "service": "nginx-thrift"
+                }
+              },
+              "spec": {
+                "volumes": [
+                  {
+                    "name": "nginx-thrift-config",
+                    "configMap": {
+                      "name": "nginx-thrift",
+                      "defaultMode": 420
+                    }
+                  },
+                  {
+                    "name": "lua-scripts",
+                    "emptyDir": {}
+                  },
+                  {
+                    "name": "pages",
+                    "emptyDir": {}
+                  },
+                  {
+                    "name": "gen-lua",
+                    "emptyDir": {}
+                  },
+                  {
+                    "name": "lua-thrift",
+                    "emptyDir": {}
+                  },
+                  {
+                    "name": "keys",
+                    "emptyDir": {}
+                  }
+                ],
+                "initContainers": [
+                  {
+                    "name": "alpine-container",
+                    "image": "docker.io/alpine/git:latest",
+                    "command": [
+                      "/bin/sh"
+                    ],
+                    "args": [
+                      "-c",
+                      "git clone https://github.com/delimitrou/DeathStarBench.git /DeathStarBench && cp -r /DeathStarBench/socialNetwork/gen-lua/* /gen-lua/ && cp -r /DeathStarBench/socialNetwork/docker/openresty-thrift/lua-thrift/* /lua-thrift/ && cp -r /DeathStarBench/socialNetwork/nginx-web-server/lua-scripts/* /lua-scripts/ && cp -r /DeathStarBench/socialNetwork/nginx-web-server/pages/* /pages/ && cp /DeathStarBench/socialNetwork/keys/* /keys/"
+                    ],
+                    "resources": {
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "1Gi"
+                      }
+                    },
+                    "volumeMounts": [
+                      {
+                        "name": "lua-scripts",
+                        "mountPath": "/lua-scripts"
+                      },
+                      {
+                        "name": "lua-thrift",
+                        "mountPath": "/lua-thrift"
+                      },
+                      {
+                        "name": "pages",
+                        "mountPath": "/pages"
+                      },
+                      {
+                        "name": "gen-lua",
+                        "mountPath": "/gen-lua"
+                      },
+                      {
+                        "name": "keys",
+                        "mountPath": "/keys"
+                      }
+                    ],
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "imagePullPolicy": "IfNotPresent"
+                  }
+                ],
+                "containers": [
+                  {
+                    "name": "nginx-thrift",
+                    "image": "docker.io/yg397/openresty-thrift:xenial",
+                    "ports": [
+                      {
+                        "containerPort": 8080,
+                        "protocol": "TCP"
+                      }
+                    ],
+                    "env": [
+                      {
+                        "name": "fqdn_suffix",
+                        "value": ".dsb.svc.cluster.local"
+                      }
+                    ],
+                    "resources": {
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "1Gi"
+                      }
+                    },
+                    "volumeMounts": [
+                      {
+                        "name": "nginx-thrift-config",
+                        "mountPath": "/usr/local/openresty/nginx/jaeger-config.json",
+                        "subPath": "jaeger-config.json"
+                      },
+                      {
+                        "name": "nginx-thrift-config",
+                        "mountPath": "/usr/local/openresty/nginx/conf/nginx.conf",
+                        "subPath": "nginx.conf"
+                      },
+                      {
+                        "name": "lua-scripts",
+                        "mountPath": "/usr/local/openresty/nginx/lua-scripts"
+                      },
+                      {
+                        "name": "lua-thrift",
+                        "mountPath": "/usr/local/openresty/lualib/thrift"
+                      },
+                      {
+                        "name": "pages",
+                        "mountPath": "/usr/local/openresty/nginx/pages"
+                      },
+                      {
+                        "name": "gen-lua",
+                        "mountPath": "/gen-lua"
+                      },
+                      {
+                        "name": "keys",
+                        "mountPath": "/keys"
+                      }
+                    ],
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "imagePullPolicy": "IfNotPresent"
+                  }
+                ],
+                "restartPolicy": "Always",
+                "terminationGracePeriodSeconds": 30,
+                "dnsPolicy": "ClusterFirst",
+                "securityContext": {},
+                "hostname": "nginx-thrift",
+                "schedulerName": "default-scheduler"
+              }
+            },
+            "strategy": {
+              "type": "RollingUpdate",
+              "rollingUpdate": {
+                "maxUnavailable": "25%",
+                "maxSurge": "25%"
+              }
+            },
+            "revisionHistoryLimit": 10,
+            "progressDeadlineSeconds": 600
+          },
+          "status": {
+            "observedGeneration": 2,
+            "replicas": 2,
+            "updatedReplicas": 2,
+            "readyReplicas": 1,
+            "availableReplicas": 1,
+            "unavailableReplicas": 1,
+            "conditions": [
+              {
+                "type": "Progressing",
+                "status": "True",
+                "lastUpdateTime": "2024-03-19T23:49:10Z",
+                "lastTransitionTime": "2024-03-19T23:49:01Z",
+                "reason": "NewReplicaSetAvailable",
+                "message": "ReplicaSet \"nginx-thrift-6d87b5777c\" has successfully progressed."
+              },
+              {
+                "type": "Available",
+                "status": "False",
+                "lastUpdateTime": "2024-03-19T23:58:14Z",
+                "lastTransitionTime": "2024-03-19T23:58:14Z",
+                "reason": "MinimumReplicasUnavailable",
+                "message": "Deployment does not have minimum availability."
+              }
+            ]
+          }
+        }
+      ],
+      "deleted_objs": []
+    },
+    {
+      "ts": 1710892950,
+      "applied_objs": [
+        {
+          "apiVersion": "apps/v1",
+          "kind": "Deployment",
+          "metadata": {
+            "annotations": {
+              "meta.helm.sh/release-name": "dsb-social-network",
+              "meta.helm.sh/release-namespace": "dsb"
+            },
+            "labels": {
+              "app.kubernetes.io/managed-by": "Helm",
+              "service": "nginx-thrift"
+            },
+            "name": "nginx-thrift",
+            "namespace": "dsb"
+          },
+          "spec": {
+            "replicas": 8,
+            "selector": {
+              "matchLabels": {
+                "service": "nginx-thrift"
+              }
+            },
+            "template": {
+              "metadata": {
+                "creationTimestamp": null,
+                "labels": {
+                  "app": "nginx-thrift",
+                  "service": "nginx-thrift"
+                }
+              },
+              "spec": {
+                "volumes": [
+                  {
+                    "name": "nginx-thrift-config",
+                    "configMap": {
+                      "name": "nginx-thrift",
+                      "defaultMode": 420
+                    }
+                  },
+                  {
+                    "name": "lua-scripts",
+                    "emptyDir": {}
+                  },
+                  {
+                    "name": "pages",
+                    "emptyDir": {}
+                  },
+                  {
+                    "name": "gen-lua",
+                    "emptyDir": {}
+                  },
+                  {
+                    "name": "lua-thrift",
+                    "emptyDir": {}
+                  },
+                  {
+                    "name": "keys",
+                    "emptyDir": {}
+                  }
+                ],
+                "initContainers": [
+                  {
+                    "name": "alpine-container",
+                    "image": "docker.io/alpine/git:latest",
+                    "command": [
+                      "/bin/sh"
+                    ],
+                    "args": [
+                      "-c",
+                      "git clone https://github.com/delimitrou/DeathStarBench.git /DeathStarBench && cp -r /DeathStarBench/socialNetwork/gen-lua/* /gen-lua/ && cp -r /DeathStarBench/socialNetwork/docker/openresty-thrift/lua-thrift/* /lua-thrift/ && cp -r /DeathStarBench/socialNetwork/nginx-web-server/lua-scripts/* /lua-scripts/ && cp -r /DeathStarBench/socialNetwork/nginx-web-server/pages/* /pages/ && cp /DeathStarBench/socialNetwork/keys/* /keys/"
+                    ],
+                    "resources": {
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "1Gi"
+                      }
+                    },
+                    "volumeMounts": [
+                      {
+                        "name": "lua-scripts",
+                        "mountPath": "/lua-scripts"
+                      },
+                      {
+                        "name": "lua-thrift",
+                        "mountPath": "/lua-thrift"
+                      },
+                      {
+                        "name": "pages",
+                        "mountPath": "/pages"
+                      },
+                      {
+                        "name": "gen-lua",
+                        "mountPath": "/gen-lua"
+                      },
+                      {
+                        "name": "keys",
+                        "mountPath": "/keys"
+                      }
+                    ],
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "imagePullPolicy": "IfNotPresent"
+                  }
+                ],
+                "containers": [
+                  {
+                    "name": "nginx-thrift",
+                    "image": "docker.io/yg397/openresty-thrift:xenial",
+                    "ports": [
+                      {
+                        "containerPort": 8080,
+                        "protocol": "TCP"
+                      }
+                    ],
+                    "env": [
+                      {
+                        "name": "fqdn_suffix",
+                        "value": ".dsb.svc.cluster.local"
+                      }
+                    ],
+                    "resources": {
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "1Gi"
+                      }
+                    },
+                    "volumeMounts": [
+                      {
+                        "name": "nginx-thrift-config",
+                        "mountPath": "/usr/local/openresty/nginx/jaeger-config.json",
+                        "subPath": "jaeger-config.json"
+                      },
+                      {
+                        "name": "nginx-thrift-config",
+                        "mountPath": "/usr/local/openresty/nginx/conf/nginx.conf",
+                        "subPath": "nginx.conf"
+                      },
+                      {
+                        "name": "lua-scripts",
+                        "mountPath": "/usr/local/openresty/nginx/lua-scripts"
+                      },
+                      {
+                        "name": "lua-thrift",
+                        "mountPath": "/usr/local/openresty/lualib/thrift"
+                      },
+                      {
+                        "name": "pages",
+                        "mountPath": "/usr/local/openresty/nginx/pages"
+                      },
+                      {
+                        "name": "gen-lua",
+                        "mountPath": "/gen-lua"
+                      },
+                      {
+                        "name": "keys",
+                        "mountPath": "/keys"
+                      }
+                    ],
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "imagePullPolicy": "IfNotPresent"
+                  }
+                ],
+                "restartPolicy": "Always",
+                "terminationGracePeriodSeconds": 30,
+                "dnsPolicy": "ClusterFirst",
+                "securityContext": {},
+                "hostname": "nginx-thrift",
+                "schedulerName": "default-scheduler"
+              }
+            },
+            "strategy": {
+              "type": "RollingUpdate",
+              "rollingUpdate": {
+                "maxUnavailable": "25%",
+                "maxSurge": "25%"
+              }
+            },
+            "revisionHistoryLimit": 10,
+            "progressDeadlineSeconds": 600
+          },
+          "status": {
+            "observedGeneration": 3,
+            "replicas": 4,
+            "updatedReplicas": 4,
+            "readyReplicas": 1,
+            "availableReplicas": 1,
+            "unavailableReplicas": 3,
+            "conditions": [
+              {
+                "type": "Progressing",
+                "status": "True",
+                "lastUpdateTime": "2024-03-19T23:49:10Z",
+                "lastTransitionTime": "2024-03-19T23:49:01Z",
+                "reason": "NewReplicaSetAvailable",
+                "message": "ReplicaSet \"nginx-thrift-6d87b5777c\" has successfully progressed."
+              },
+              {
+                "type": "Available",
+                "status": "False",
+                "lastUpdateTime": "2024-03-19T23:58:14Z",
+                "lastTransitionTime": "2024-03-19T23:58:14Z",
+                "reason": "MinimumReplicasUnavailable",
+                "message": "Deployment does not have minimum availability."
+              }
+            ]
+          }
+        }
+      ],
+      "deleted_objs": []
+    },
+    {
+      "ts": 1710892957,
+      "applied_objs": [
+        {
+          "apiVersion": "apps/v1",
+          "kind": "Deployment",
+          "metadata": {
+            "annotations": {
+              "meta.helm.sh/release-name": "dsb-social-network",
+              "meta.helm.sh/release-namespace": "dsb"
+            },
+            "labels": {
+              "app.kubernetes.io/managed-by": "Helm",
+              "service": "post-storage-service"
+            },
+            "name": "post-storage-service",
+            "namespace": "dsb"
+          },
+          "spec": {
+            "replicas": 5,
+            "selector": {
+              "matchLabels": {
+                "service": "post-storage-service"
+              }
+            },
+            "template": {
+              "metadata": {
+                "creationTimestamp": null,
+                "labels": {
+                  "app": "post-storage-service",
+                  "service": "post-storage-service"
+                }
+              },
+              "spec": {
+                "volumes": [
+                  {
+                    "name": "post-storage-service-config",
+                    "configMap": {
+                      "name": "post-storage-service",
+                      "defaultMode": 420
+                    }
+                  }
+                ],
+                "containers": [
+                  {
+                    "name": "post-storage-service",
+                    "image": "docker.io/deathstarbench/social-network-microservices:latest",
+                    "command": [
+                      "PostStorageService"
+                    ],
+                    "ports": [
+                      {
+                        "containerPort": 9090,
+                        "protocol": "TCP"
+                      }
+                    ],
+                    "resources": {
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "1Gi"
+                      }
+                    },
+                    "volumeMounts": [
+                      {
+                        "name": "post-storage-service-config",
+                        "mountPath": "/social-network-microservices/config/jaeger-config.yml",
+                        "subPath": "jaeger-config.yml"
+                      },
+                      {
+                        "name": "post-storage-service-config",
+                        "mountPath": "/social-network-microservices/config/service-config.json",
+                        "subPath": "service-config.json"
+                      }
+                    ],
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "imagePullPolicy": "IfNotPresent"
+                  }
+                ],
+                "restartPolicy": "Always",
+                "terminationGracePeriodSeconds": 30,
+                "dnsPolicy": "ClusterFirst",
+                "securityContext": {},
+                "hostname": "post-storage-service",
+                "schedulerName": "default-scheduler"
+              }
+            },
+            "strategy": {
+              "type": "RollingUpdate",
+              "rollingUpdate": {
+                "maxUnavailable": "25%",
+                "maxSurge": "25%"
+              }
+            },
+            "revisionHistoryLimit": 10,
+            "progressDeadlineSeconds": 600
+          },
+          "status": {
+            "observedGeneration": 2,
+            "replicas": 3,
+            "updatedReplicas": 3,
+            "readyReplicas": 1,
+            "availableReplicas": 1,
+            "unavailableReplicas": 2,
+            "conditions": [
+              {
+                "type": "Progressing",
+                "status": "True",
+                "lastUpdateTime": "2024-03-19T23:49:04Z",
+                "lastTransitionTime": "2024-03-19T23:49:01Z",
+                "reason": "NewReplicaSetAvailable",
+                "message": "ReplicaSet \"post-storage-service-5685dffb9\" has successfully progressed."
+              },
+              {
+                "type": "Available",
+                "status": "False",
+                "lastUpdateTime": "2024-03-20T00:02:07Z",
+                "lastTransitionTime": "2024-03-20T00:02:07Z",
+                "reason": "MinimumReplicasUnavailable",
+                "message": "Deployment does not have minimum availability."
+              }
+            ]
+          }
+        }
+      ],
+      "deleted_objs": []
+    },
+    {
+      "ts": 1710892965,
+      "applied_objs": [
+        {
+          "apiVersion": "apps/v1",
+          "kind": "Deployment",
+          "metadata": {
+            "annotations": {
+              "meta.helm.sh/release-name": "dsb-social-network",
+              "meta.helm.sh/release-namespace": "dsb"
+            },
+            "labels": {
+              "app.kubernetes.io/managed-by": "Helm",
+              "service": "nginx-thrift"
+            },
+            "name": "nginx-thrift",
+            "namespace": "dsb"
+          },
+          "spec": {
+            "replicas": 10,
+            "selector": {
+              "matchLabels": {
+                "service": "nginx-thrift"
+              }
+            },
+            "template": {
+              "metadata": {
+                "creationTimestamp": null,
+                "labels": {
+                  "app": "nginx-thrift",
+                  "service": "nginx-thrift"
+                }
+              },
+              "spec": {
+                "volumes": [
+                  {
+                    "name": "nginx-thrift-config",
+                    "configMap": {
+                      "name": "nginx-thrift",
+                      "defaultMode": 420
+                    }
+                  },
+                  {
+                    "name": "lua-scripts",
+                    "emptyDir": {}
+                  },
+                  {
+                    "name": "pages",
+                    "emptyDir": {}
+                  },
+                  {
+                    "name": "gen-lua",
+                    "emptyDir": {}
+                  },
+                  {
+                    "name": "lua-thrift",
+                    "emptyDir": {}
+                  },
+                  {
+                    "name": "keys",
+                    "emptyDir": {}
+                  }
+                ],
+                "initContainers": [
+                  {
+                    "name": "alpine-container",
+                    "image": "docker.io/alpine/git:latest",
+                    "command": [
+                      "/bin/sh"
+                    ],
+                    "args": [
+                      "-c",
+                      "git clone https://github.com/delimitrou/DeathStarBench.git /DeathStarBench && cp -r /DeathStarBench/socialNetwork/gen-lua/* /gen-lua/ && cp -r /DeathStarBench/socialNetwork/docker/openresty-thrift/lua-thrift/* /lua-thrift/ && cp -r /DeathStarBench/socialNetwork/nginx-web-server/lua-scripts/* /lua-scripts/ && cp -r /DeathStarBench/socialNetwork/nginx-web-server/pages/* /pages/ && cp /DeathStarBench/socialNetwork/keys/* /keys/"
+                    ],
+                    "resources": {
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "1Gi"
+                      }
+                    },
+                    "volumeMounts": [
+                      {
+                        "name": "lua-scripts",
+                        "mountPath": "/lua-scripts"
+                      },
+                      {
+                        "name": "lua-thrift",
+                        "mountPath": "/lua-thrift"
+                      },
+                      {
+                        "name": "pages",
+                        "mountPath": "/pages"
+                      },
+                      {
+                        "name": "gen-lua",
+                        "mountPath": "/gen-lua"
+                      },
+                      {
+                        "name": "keys",
+                        "mountPath": "/keys"
+                      }
+                    ],
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "imagePullPolicy": "IfNotPresent"
+                  }
+                ],
+                "containers": [
+                  {
+                    "name": "nginx-thrift",
+                    "image": "docker.io/yg397/openresty-thrift:xenial",
+                    "ports": [
+                      {
+                        "containerPort": 8080,
+                        "protocol": "TCP"
+                      }
+                    ],
+                    "env": [
+                      {
+                        "name": "fqdn_suffix",
+                        "value": ".dsb.svc.cluster.local"
+                      }
+                    ],
+                    "resources": {
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "1Gi"
+                      }
+                    },
+                    "volumeMounts": [
+                      {
+                        "name": "nginx-thrift-config",
+                        "mountPath": "/usr/local/openresty/nginx/jaeger-config.json",
+                        "subPath": "jaeger-config.json"
+                      },
+                      {
+                        "name": "nginx-thrift-config",
+                        "mountPath": "/usr/local/openresty/nginx/conf/nginx.conf",
+                        "subPath": "nginx.conf"
+                      },
+                      {
+                        "name": "lua-scripts",
+                        "mountPath": "/usr/local/openresty/nginx/lua-scripts"
+                      },
+                      {
+                        "name": "lua-thrift",
+                        "mountPath": "/usr/local/openresty/lualib/thrift"
+                      },
+                      {
+                        "name": "pages",
+                        "mountPath": "/usr/local/openresty/nginx/pages"
+                      },
+                      {
+                        "name": "gen-lua",
+                        "mountPath": "/gen-lua"
+                      },
+                      {
+                        "name": "keys",
+                        "mountPath": "/keys"
+                      }
+                    ],
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "imagePullPolicy": "IfNotPresent"
+                  }
+                ],
+                "restartPolicy": "Always",
+                "terminationGracePeriodSeconds": 30,
+                "dnsPolicy": "ClusterFirst",
+                "securityContext": {},
+                "hostname": "nginx-thrift",
+                "schedulerName": "default-scheduler"
+              }
+            },
+            "strategy": {
+              "type": "RollingUpdate",
+              "rollingUpdate": {
+                "maxUnavailable": "25%",
+                "maxSurge": "25%"
+              }
+            },
+            "revisionHistoryLimit": 10,
+            "progressDeadlineSeconds": 600
+          },
+          "status": {
+            "observedGeneration": 4,
+            "replicas": 8,
+            "updatedReplicas": 8,
+            "readyReplicas": 1,
+            "availableReplicas": 1,
+            "unavailableReplicas": 7,
+            "conditions": [
+              {
+                "type": "Progressing",
+                "status": "True",
+                "lastUpdateTime": "2024-03-19T23:49:10Z",
+                "lastTransitionTime": "2024-03-19T23:49:01Z",
+                "reason": "NewReplicaSetAvailable",
+                "message": "ReplicaSet \"nginx-thrift-6d87b5777c\" has successfully progressed."
+              },
+              {
+                "type": "Available",
+                "status": "False",
+                "lastUpdateTime": "2024-03-19T23:58:14Z",
+                "lastTransitionTime": "2024-03-19T23:58:14Z",
+                "reason": "MinimumReplicasUnavailable",
+                "message": "Deployment does not have minimum availability."
+              }
+            ]
+          }
+        }
+      ],
+      "deleted_objs": []
+    },
+    {
+      "ts": 1710893091,
+      "applied_objs": [],
+      "deleted_objs": []
+    },
+    {
+      "ts": 1710893124,
+      "applied_objs": [],
+      "deleted_objs": []
+    },
+    {
+      "ts": 1710893126,
+      "applied_objs": [
+        {
+          "apiVersion": "apps/v1",
+          "kind": "Deployment",
+          "metadata": {
+            "annotations": {
+              "meta.helm.sh/release-name": "dsb-social-network",
+              "meta.helm.sh/release-namespace": "dsb"
+            },
+            "labels": {
+              "app.kubernetes.io/managed-by": "Helm",
+              "service": "text-service"
+            },
+            "name": "text-service",
+            "namespace": "dsb"
+          },
+          "spec": {
+            "replicas": 1,
+            "selector": {
+              "matchLabels": {
+                "service": "text-service"
+              }
+            },
+            "template": {
+              "metadata": {
+                "creationTimestamp": null,
+                "labels": {
+                  "app": "text-service",
+                  "service": "text-service"
+                }
+              },
+              "spec": {
+                "volumes": [
+                  {
+                    "name": "text-service-config",
+                    "configMap": {
+                      "name": "text-service",
+                      "defaultMode": 420
+                    }
+                  }
+                ],
+                "containers": [
+                  {
+                    "name": "text-service",
+                    "image": "docker.io/deathstarbench/social-network-microservices:latest",
+                    "command": [
+                      "TextService"
+                    ],
+                    "ports": [
+                      {
+                        "containerPort": 9090,
+                        "protocol": "TCP"
+                      }
+                    ],
+                    "resources": {
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "1Gi"
+                      }
+                    },
+                    "volumeMounts": [
+                      {
+                        "name": "text-service-config",
+                        "mountPath": "/social-network-microservices/config/jaeger-config.yml",
+                        "subPath": "jaeger-config.yml"
+                      },
+                      {
+                        "name": "text-service-config",
+                        "mountPath": "/social-network-microservices/config/service-config.json",
+                        "subPath": "service-config.json"
+                      }
+                    ],
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "imagePullPolicy": "IfNotPresent"
+                  }
+                ],
+                "restartPolicy": "Always",
+                "terminationGracePeriodSeconds": 30,
+                "dnsPolicy": "ClusterFirst",
+                "securityContext": {},
+                "hostname": "text-service",
+                "schedulerName": "default-scheduler"
+              }
+            },
+            "strategy": {
+              "type": "RollingUpdate",
+              "rollingUpdate": {
+                "maxUnavailable": "25%",
+                "maxSurge": "25%"
+              }
+            },
+            "revisionHistoryLimit": 10,
+            "progressDeadlineSeconds": 600
+          },
+          "status": {
+            "observedGeneration": 3,
+            "replicas": 5,
+            "updatedReplicas": 5,
+            "readyReplicas": 1,
+            "availableReplicas": 1,
+            "unavailableReplicas": 4,
+            "conditions": [
+              {
+                "type": "Progressing",
+                "status": "True",
+                "lastUpdateTime": "2024-03-19T23:49:02Z",
+                "lastTransitionTime": "2024-03-19T23:49:00Z",
+                "reason": "NewReplicaSetAvailable",
+                "message": "ReplicaSet \"text-service-84dc55fcd7\" has successfully progressed."
+              },
+              {
+                "type": "Available",
+                "status": "False",
+                "lastUpdateTime": "2024-03-19T23:58:11Z",
+                "lastTransitionTime": "2024-03-19T23:58:11Z",
+                "reason": "MinimumReplicasUnavailable",
+                "message": "Deployment does not have minimum availability."
+              }
+            ]
+          }
+        }
+      ],
+      "deleted_objs": []
+    },
+    {
+      "ts": 1710893272,
+      "applied_objs": [
+        {
+          "apiVersion": "apps/v1",
+          "kind": "Deployment",
+          "metadata": {
+            "annotations": {
+              "meta.helm.sh/release-name": "dsb-social-network",
+              "meta.helm.sh/release-namespace": "dsb"
+            },
+            "labels": {
+              "app.kubernetes.io/managed-by": "Helm",
+              "service": "compose-post-service"
+            },
+            "name": "compose-post-service",
+            "namespace": "dsb"
+          },
+          "spec": {
+            "replicas": 2,
+            "selector": {
+              "matchLabels": {
+                "service": "compose-post-service"
+              }
+            },
+            "template": {
+              "metadata": {
+                "creationTimestamp": null,
+                "labels": {
+                  "app": "compose-post-service",
+                  "service": "compose-post-service"
+                }
+              },
+              "spec": {
+                "volumes": [
+                  {
+                    "name": "compose-post-service-config",
+                    "configMap": {
+                      "name": "compose-post-service",
+                      "defaultMode": 420
+                    }
+                  }
+                ],
+                "containers": [
+                  {
+                    "name": "compose-post-service",
+                    "image": "docker.io/deathstarbench/social-network-microservices:latest",
+                    "command": [
+                      "ComposePostService"
+                    ],
+                    "ports": [
+                      {
+                        "containerPort": 9090,
+                        "protocol": "TCP"
+                      }
+                    ],
+                    "resources": {
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "1Gi"
+                      }
+                    },
+                    "volumeMounts": [
+                      {
+                        "name": "compose-post-service-config",
+                        "mountPath": "/social-network-microservices/config/jaeger-config.yml",
+                        "subPath": "jaeger-config.yml"
+                      },
+                      {
+                        "name": "compose-post-service-config",
+                        "mountPath": "/social-network-microservices/config/service-config.json",
+                        "subPath": "service-config.json"
+                      }
+                    ],
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "imagePullPolicy": "IfNotPresent"
+                  }
+                ],
+                "restartPolicy": "Always",
+                "terminationGracePeriodSeconds": 30,
+                "dnsPolicy": "ClusterFirst",
+                "securityContext": {},
+                "hostname": "compose-post-service",
+                "schedulerName": "default-scheduler"
+              }
+            },
+            "strategy": {
+              "type": "RollingUpdate",
+              "rollingUpdate": {
+                "maxUnavailable": "25%",
+                "maxSurge": "25%"
+              }
+            },
+            "revisionHistoryLimit": 10,
+            "progressDeadlineSeconds": 600
+          },
+          "status": {
+            "observedGeneration": 3,
+            "replicas": 6,
+            "updatedReplicas": 6,
+            "readyReplicas": 4,
+            "availableReplicas": 4,
+            "unavailableReplicas": 2,
+            "conditions": [
+              {
+                "type": "Progressing",
+                "status": "True",
+                "lastUpdateTime": "2024-03-19T23:49:02Z",
+                "lastTransitionTime": "2024-03-19T23:48:58Z",
+                "reason": "NewReplicaSetAvailable",
+                "message": "ReplicaSet \"compose-post-service-84d56c9dcb\" has successfully progressed."
+              },
+              {
+                "type": "Available",
+                "status": "False",
+                "lastUpdateTime": "2024-03-19T23:58:06Z",
+                "lastTransitionTime": "2024-03-19T23:58:06Z",
+                "reason": "MinimumReplicasUnavailable",
+                "message": "Deployment does not have minimum availability."
+              }
+            ]
+          }
+        }
+      ],
+      "deleted_objs": []
+    },
+    {
+      "ts": 1710893302,
+      "applied_objs": [],
+      "deleted_objs": []
+    }
+  ],
+  "index": {
+    "apps/v1.Deployment": {
+      "dsb/nginx-thrift": 8615945982318756151,
+      "dsb/compose-post-service": 10850747852008766550,
+      "dsb/text-service": 9998312074885982535,
+      "dsb/post-storage-service": 14312611903795797094
+    }
+  },
+  "pod_lifecycles": {}
+}

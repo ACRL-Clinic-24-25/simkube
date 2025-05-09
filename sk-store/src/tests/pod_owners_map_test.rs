@@ -1,7 +1,11 @@
 use std::collections::HashMap;
 
 use super::*;
-use crate::pod_owners_map::{filter_lifecycles_map, PodLifecyclesMap, PodOwnersMap};
+use crate::pod_owners_map::{
+    filter_lifecycles_map,
+    PodLifecyclesMap,
+    PodOwnersMap,
+};
 
 const START_TS: i64 = 5;
 const END_TS: i64 = 10;

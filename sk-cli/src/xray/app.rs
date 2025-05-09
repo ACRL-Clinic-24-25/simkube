@@ -1,6 +1,9 @@
 use ratatui::widgets::ListState;
 
-use crate::validation::{AnnotatedTrace, VALIDATORS};
+use crate::validation::{
+    AnnotatedTrace,
+    VALIDATORS,
+};
 
 #[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
 pub(super) enum Mode {

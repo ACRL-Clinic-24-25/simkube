@@ -6,7 +6,10 @@ use ratatui::backend::Backend;
 use ratatui::Terminal;
 use sk_core::prelude::*;
 
-use self::app::{App, Message};
+use self::app::{
+    App,
+    Message,
+};
 use self::event::handle_event;
 use self::view::view;
 

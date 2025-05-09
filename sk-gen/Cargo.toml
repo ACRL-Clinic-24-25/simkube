@@ -28,7 +28,7 @@ rand.workspace = true
 rand_distr.workspace = true
 json-patch = "*"
 k8s-openapi = { workspace = true, features = ["v1_31"] }
-indicatif = "0.17.7"
+indicatif = { version = "0.17.7", features = ["rayon"] }
 
 # testutils dependencies
 mockall = { workspace = true, optional = true }

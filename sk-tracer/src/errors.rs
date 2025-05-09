@@ -1,4 +1,7 @@
-use std::sync::{MutexGuard, PoisonError};
+use std::sync::{
+    MutexGuard,
+    PoisonError,
+};
 
 use rocket::Responder;
 use sk_store::TraceStore;

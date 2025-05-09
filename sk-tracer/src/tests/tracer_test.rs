@@ -1,7 +1,13 @@
-use std::sync::{Arc, Mutex};
+use std::sync::{
+    Arc,
+    Mutex,
+};
 
 use object_store::ObjectStoreScheme;
-use sk_core::external_storage::{MockObjectStoreWrapper, SkObjectStore};
+use sk_core::external_storage::{
+    MockObjectStoreWrapper,
+    SkObjectStore,
+};
 
 use super::*;
 

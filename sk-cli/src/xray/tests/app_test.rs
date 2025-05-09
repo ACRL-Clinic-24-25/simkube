@@ -2,7 +2,10 @@ use ratatui::widgets::ListState;
 use sk_store::TraceEvent;
 
 use super::*;
-use crate::validation::{AnnotatedTrace, AnnotatedTraceEvent};
+use crate::validation::{
+    AnnotatedTrace,
+    AnnotatedTraceEvent,
+};
 
 #[rstest]
 fn test_app_update_quit() {

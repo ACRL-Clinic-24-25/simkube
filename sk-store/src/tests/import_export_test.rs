@@ -1,4 +1,7 @@
-use std::sync::{Arc, Mutex};
+use std::sync::{
+    Arc,
+    Mutex,
+};
 
 use clockabilly::mock::MockUtcClock;
 use futures::stream;
@@ -10,7 +13,11 @@ use sk_api::v1::ExportFilters;
 use sk_core::macros::*;
 
 use super::*;
-use crate::watchers::{DynObjHandler, ObjStream, ObjWatcher};
+use crate::watchers::{
+    DynObjHandler,
+    ObjStream,
+    ObjWatcher,
+};
 use crate::TraceStore;
 
 fn d(idx: i64) -> DynamicObject {

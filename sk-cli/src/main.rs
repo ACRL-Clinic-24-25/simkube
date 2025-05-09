@@ -7,7 +7,12 @@ mod snapshot;
 mod validation;
 mod xray;
 
-use clap::{crate_version, CommandFactory, Parser, Subcommand};
+use clap::{
+    crate_version,
+    CommandFactory,
+    Parser,
+    Subcommand,
+};
 use sk_core::prelude::*;
 
 use crate::validation::ValidateSubcommand;

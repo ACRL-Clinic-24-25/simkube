@@ -1,3 +1,4 @@
+#![allow(clippy::missing_docs_in_private_items)]
 // copied FROM petgraph::algo::dijkstra and petgraph::scored TO ADD PREDECESSOR RETURN, only change:
 // uncommented existing predecessor code and added to the return type
 
@@ -20,15 +21,6 @@ use petgraph::visit::{
     Visitable,
 };
 
-/// `MinScored<K, T>` holds a score `K` and a scored object `T` in
-/// a pair for use with a `BinaryHeap`.
-///
-/// `MinScored` compares in reverse order by the score, so that we can
-/// use `BinaryHeap` as a min-heap to extract the score-value pair with the
-/// least score.
-///
-/// **Note:** `MinScored` implements a total order (`Ord`), so that it is
-/// possible to use float types as scores.
 #[derive(Copy, Clone, Debug)]
 pub struct MinScored<K, T>(pub K, pub T);
 
@@ -112,13 +104,34 @@ impl<K: PartialOrd, T> Ord for MaxScored<K, T> {
     }
 }
 
-// from petgraph::algo::dijkstra
+/// Result of the Dijkstra shortest-path algorithm.
+/// 
+/// Contains the distances from the start node to each reachable node,
+/// and the predecessor mapping to reconstruct paths.
+#[derive(Debug, Clone)]
+pub struct DijkstraResult<N, K> {
+    /// Mapping from node to its distance from the start node.
+    pub distances: HashMap<N, K>,
+    
+    /// Mapping from node to its predecessor in the shortest path.
+    /// 
+    /// Used to reconstruct the path from start to any node.
+    pub predecessors: HashMap<N, N>,
+}
+
+impl<N, K> DijkstraResult<N, K> {
+    /// Creates a new DijkstraResult from distances and predecessors maps
+    pub fn new(distances: HashMap<N, K>, predecessors: HashMap<N, N>) -> Self {
+        Self { distances, predecessors }
+    }
+}
+
 pub fn dijkstra<G, F, K>(
     graph: G,
     start: G::NodeId,
     goal: Option<G::NodeId>,
     mut edge_cost: F,
-) -> (HashMap<G::NodeId, K>, HashMap<G::NodeId, G::NodeId>)
+) -> DijkstraResult<G::NodeId, K>
 where
     G: IntoEdges + Visitable,
     G::NodeId: Eq + Hash,
@@ -150,7 +163,7 @@ where
                     if next_score < *ent.get() {
                         *ent.into_mut() = next_score;
                         visit_next.push(MinScored(next_score, next));
-                        //predecessor.insert(next.clone(), node.clone());
+                        predecessor.insert(next, node);
                     }
                 },
                 Vacant(ent) => {
@@ -162,5 +175,5 @@ where
         }
         visited.visit(node);
     }
-    (scores, predecessor)
+    DijkstraResult::new(scores, predecessor)
 }

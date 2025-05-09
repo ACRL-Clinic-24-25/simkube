@@ -1,5 +1,9 @@
 use httpmock::prelude::*;
-use httpmock::{Mock, Then, When};
+use httpmock::{
+    Mock,
+    Then,
+    When,
+};
 use serde_json::json;
 
 pub struct MockServerBuilder {

@@ -46,4 +46,7 @@ macro_rules! partial_ord_eq_ref {
 }
 
 pub(crate) use partial_ord_eq_ref;
-pub use {klabel, klabel_insert};
+pub use {
+    klabel,
+    klabel_insert,
+};

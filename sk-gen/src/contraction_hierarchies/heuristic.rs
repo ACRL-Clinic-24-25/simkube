@@ -5,24 +5,37 @@ use petgraph::graph::{
     NodeIndex,
 };
 
+/// Generates a contraction order for the given graph using nested dissection
+/// to partition the graph hierarchically and produce an efficient contraction sequence.
+/// 
+/// This helps optimize the contraction process by minimizing the number of shortcuts needed.
 pub fn nested_dissection_contraction_order<N, E>(graph: Graph<N, E>) -> Vec<NodeIndex> {
     let heuristic_graph = HeuristicGraph { graph };
     heuristic_graph.contraction_order()
 }
 
+/// A graph wrapper that provides heuristic functions for contraction hierarchies.
 pub struct HeuristicGraph<N, E> {
+    /// The underlying graph data structure.
     pub graph: Graph<N, E>,
 }
 
 impl<N, E> HeuristicGraph<N, E> {
+    /// Creates a new HeuristicGraph from an existing graph.
     pub fn new(graph: Graph<N, E>) -> Self {
         Self { graph }
     }
 
+    /// Generates a contraction order for the graph nodes.
+    /// 
+    /// The contraction order is the sequence in which nodes should be removed when creating the contraction hierarchy.
     pub fn contraction_order(&self) -> Vec<NodeIndex> {
         self.generate_partition_tree(self.graph.node_indices().collect()).to_vec()
     }
 
+    /// Recursively generates a partition tree for the given nodes.
+    ///
+    /// The partition tree represents the hierarchical decomposition of the graph, which is used to push the separator set to the end of the contraction order at each recursive level.
     pub fn generate_partition_tree(&self, nodes: Vec<NodeIndex>) -> PartitionTreeNode {
         if nodes.len() <= 1 {
             return PartitionTreeNode { a: None, b: None, separator: nodes };
@@ -59,71 +72,71 @@ impl<N, E> HeuristicGraph<N, E> {
 
         let mut a = Vec::new();
         let mut b = Vec::new();
-        for (i, &p) in part.iter().enumerate() {
-            let node = metis_to_node[i];
-            if p == 0 {
-                a.push(node);
-            } else {
-                b.push(node);
+
+        // partition into a, b, and separator
+        for (metis_idx, &p) in part.iter().enumerate() {
+            let node = metis_to_node[metis_idx];
+            match p {
+                0 => a.push(node),
+                1 => b.push(node),
+                _ => panic!("METIS returned an invalid partition"),
             }
         }
 
-        // TODO: The correct way
-        // Let S be the minimal vertex cover of the edges with one endpoint in each of A,B.
-        //
-        // A' = A \ S
-        // B' = B \ S
-        // (A',B',S) is our dissection
-
-        // HACK: Identify separator nodes as those in A that have neighbors in B.
-        let mut separator = Vec::new();
-        let mut is_separator = vec![false; nodes.len()];
-        for &node in &a {
-            for neighbor in self.graph.neighbors(node) {
-                if nodes.contains(&neighbor) && part[node_to_metis[&neighbor]] == 1 {
-                    is_separator[node_to_metis[&node]] = true;
-                    break;
-                }
-            }
+        // TODO: separator should not be empty (by construction)
+        if a.is_empty() || b.is_empty() {
+            // if the partition fails to create two non-empty sets, default to empty separator
+            let (left, right) = nodes.split_at(nodes.len() / 2);
+            a = left.to_vec();
+            b = right.to_vec();
         }
-        a.retain(|&node| {
-            if is_separator[node_to_metis[&node]] {
-                separator.push(node);
-                false
-            } else {
-                true
-            }
-        });
 
-        // Recurse
-        let left = self.generate_partition_tree(a);
-        let right = self.generate_partition_tree(b);
+        let a_tree = if a.is_empty() {
+            None
+        } else {
+            Some(Box::new(self.generate_partition_tree(a)))
+        };
 
-        PartitionTreeNode {
-            a: Some(Box::new(left)),
-            b: Some(Box::new(right)),
-            separator,
-        }
+        let b_tree = if b.is_empty() {
+            None
+        } else {
+            Some(Box::new(self.generate_partition_tree(b)))
+        };
+
+        let separator = Vec::new();
+
+        PartitionTreeNode { a: a_tree, b: b_tree, separator }
     }
 }
 
+/// A tree structure representing the hierarchical partitioning of a graph.
+/// 
+/// Used as part of the nested dissection algorithm to generate contraction orders.
+#[derive(Debug)]
 pub struct PartitionTreeNode {
-    a: Option<Box<PartitionTreeNode>>,
-    b: Option<Box<PartitionTreeNode>>,
-    separator: Vec<NodeIndex>,
+    /// The first partition of nodes.
+    pub a: Option<Box<PartitionTreeNode>>,
+    /// The second partition of nodes.
+    pub b: Option<Box<PartitionTreeNode>>,
+    /// The separator nodes.
+    pub separator: Vec<NodeIndex>,
 }
 
 impl PartitionTreeNode {
     /// Flattens the recursive ordering into a single vector.
     pub fn to_vec(&self) -> Vec<NodeIndex> {
-        let mut order = Vec::new();
-        if let Some(ref left) = self.a {
-            order.extend(left.to_vec());
+        let mut result = Vec::new();
+
+        if let Some(a) = &self.a {
+            result.extend(a.to_vec());
         }
-        if let Some(ref right) = self.b {
-            order.extend(right.to_vec());
+
+        if let Some(b) = &self.b {
+            result.extend(b.to_vec());
         }
-        order.extend(&self.separator);
-        order
+
+        result.extend(&self.separator);
+
+        result
     }
 }

@@ -1,4 +1,9 @@
-use std::cmp::{max, min, Ord, Ordering};
+use std::cmp::{
+    max,
+    min,
+    Ord,
+    Ordering,
+};
 
 use tracing::*;
 
