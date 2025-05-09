@@ -1,8 +1,8 @@
 #![deny(missing_docs, clippy::nursery, clippy::pedantic)]
-//! SimKube Synthetic Trace Generator Command Line Interface (main entrypoint for the work of the ACRL 24'-25' Clinic team)
+//! `SimKube` Synthetic Trace Generator Command Line Interface (main entrypoint for the work of the ACRL 24'-25' Clinic team)
 //! 
 //! This binary provides a command-line interface to the sk-gen library, allowing users
-//! to generate synthetic Kubernetes traces based on recorded [`ExportedTraces`](`ExportTrace`) serialized as either JSON or MessagePack
+//! to generate synthetic Kubernetes traces based on recorded [`ExportedTraces`](`ExportTrace`) serialized as either JSON or `MessagePack`
 //! and custom expansion actions defined in JQ scripts
 //! See binary --help for more information
 
@@ -60,7 +60,7 @@ pub struct Cli {
     #[arg(short = 'e', long, default_value_t = 3)]
     enumeration_steps: u64,
 
-    /// Paths to files containing SimKube ExportedTraces serialized as either JSON or MessagePack.
+    /// Paths to files containing `SimKube` `ExportedTraces` serialized as either JSON or `MessagePack`.
     #[arg(short = 't', long)]
     pub input_traces: Vec<PathBuf>,
 
@@ -244,28 +244,25 @@ fn main() -> Result<()> {
         input_traces.push(events);
     }
 
-    let imported_scripts = match &args.script_directory {
-        Some(path) => {
-            info!("Loading JQ scripts from {}", path.display());
-            match read_scripts_from_dir(path) {
-                Ok(scripts) => {
-                    if scripts.is_empty() {
-                        warn!("No JQ scripts found in {}", path.display());
-                    } else {
-                        info!("Loaded {} JQ scripts", scripts.len());
-                    }
-                    scripts
-                },
-                Err(e) => {
-                    error!("Failed to load JQ scripts: {}", e);
-                    Vec::new()
+    let imported_scripts = if let Some(path) = &args.script_directory {
+        info!("Loading JQ scripts from {}", path.display());
+        match read_scripts_from_dir(path) {
+            Ok(scripts) => {
+                if scripts.is_empty() {
+                    warn!("No JQ scripts found in {}", path.display());
+                } else {
+                    info!("Loaded {} JQ scripts", scripts.len());
                 }
+                scripts
+            },
+            Err(e) => {
+                error!("Failed to load JQ scripts: {}", e);
+                Vec::new()
             }
-        },
-        None => {
-            warn!("No script import path provided. Will not generate any actions during enumeration.");
-            Vec::new()
-        },
+        }
+    } else {
+        warn!("No script import path provided. Will not generate any actions during enumeration.");
+        Vec::new()
     };
     
     sk_gen::simulation::run(

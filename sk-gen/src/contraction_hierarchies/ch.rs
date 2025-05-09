@@ -34,13 +34,14 @@ pub enum CHNode<Node> {
 }
 
 impl<Node> CHNode<Node> {
-    /// Creates a new CHNode in the Original state.
-    fn new_original(node: Node) -> Self {
-        CHNode::Original { node }
+    /// Creates a new `CHNode` in the Original state.
+    const fn new_original(node: Node) -> Self {
+        Self::Original { node }
     }
 }
 
 /// A wrapper on Edge which lets us mark a node as contracted during a particular iteration.
+///
 /// Rather than allocating a new graph on each contraction iteration, we can simply annotate at
 /// which iteration each shortcut was formed or edge orphaned.
 #[derive(Clone)]
@@ -70,9 +71,9 @@ pub enum CHEdge<Edge> {
 }
 
 impl<Edge> CHEdge<Edge> {
-    /// Creates a new CHEdge in the Original state.
-    fn new_original(edge: Edge) -> Self {
-        CHEdge::Original { edge }
+    /// Creates a new `CHEdge` in the Original state.
+    const fn new_original(edge: Edge) -> Self {
+        Self::Original { edge }
     }
 }
 
@@ -80,8 +81,8 @@ impl<Edge> CHEdge<Edge> {
 impl<Edge: std::fmt::Debug + Distance> std::fmt::Debug for CHEdge<Edge> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            CHEdge::Original { edge } => f.debug_struct("Original").field("edge", edge).finish(),
-            CHEdge::Shortcut { edges, nodes, iteration } => {
+            Self::Original { edge } => f.debug_struct("Original").field("edge", edge).finish(),
+            Self::Shortcut { edges, nodes, iteration } => {
                 let probability = self.probability().into_inner(); // Calculate probability from surprisal
 
                 f.debug_struct("Shortcut")
@@ -91,7 +92,7 @@ impl<Edge: std::fmt::Debug + Distance> std::fmt::Debug for CHEdge<Edge> {
                     .field("probability", &probability)
                     .finish()
             },
-            CHEdge::Orphaned { edge, iteration } => f
+            Self::Orphaned { edge, iteration } => f
                 .debug_struct("Orphaned")
                 .field("edge", edge)
                 .field("iteration", iteration)
@@ -125,7 +126,7 @@ impl<E: Distance> Distance for CHEdge<E> {
     fn probability(&self) -> OrderedFloat<f64> {
         match self {
             Self::Original { edge } => edge.probability(),
-            Self::Shortcut { edges, .. } => edges.iter().map(|edge| edge.probability()).product(),
+            Self::Shortcut { edges, .. } => edges.iter().map(Distance::probability).product(),
             Self::Orphaned { .. } => OrderedFloat(0.0),
         }
     }
@@ -231,7 +232,7 @@ where
     E: Clone + Hash + Debug + Distance,
     H: ContractionHeuristic<N, E>,
 {
-    /// Annotate a graph over node type `N` and edge type `E` with CHNode and CHEdge wrappers.
+    /// Annotate a graph over node type `N` and edge type `E` with `CHNode` and `CHEdge` wrappers.
     fn annotate_graph(graph: Graph<N, E>) -> Graph<CHNode<N>, CHEdge<E>> {
         graph.map(|_, n| CHNode::new_original(n.clone()), |_, e| CHEdge::new_original(e.clone()))
     }
@@ -296,10 +297,10 @@ where
         })
     }
 
-    /// Limited-distance version of g_distance.
+    /// Limited-distance version of `g_distance`.
     ///
     /// Intended to constrain the search to paths with surprisal less than the limit.
-    /// Currently just delegates to g_distance without using the limit.
+    /// Currently just delegates to `g_distance` without using the limit.
     fn g_distance_limited(
         &self,
         x: NodeIndex,

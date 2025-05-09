@@ -64,7 +64,7 @@ pub fn tracestore_from_events(events: &[TraceEvent]) -> TraceStore {
 
 /// Compute the difference between two object maps, returning new/updated (applied) and removed
 /// (deleted) objects.
-pub fn diff_objects<'a>(
+#[must_use] pub fn diff_objects<'a>(
     before: &'a std::collections::BTreeMap<ObjectKey, DynamicObjectNewType>,
     after: &'a std::collections::BTreeMap<ObjectKey, DynamicObjectNewType>,
 ) -> (Vec<DynamicObject>, Vec<DynamicObject>) {

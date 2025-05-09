@@ -279,7 +279,7 @@ fn contract_graph(
     let iterations = target.min(contraction_order.len());
 
     info!(iterations, total_nodes, contraction_strength, "Starting contraction");
-    let mut ch = crate::contraction_hierarchies::CH::new(state_graph.clone(), contraction_order.into_iter());
+    let mut ch = crate::contraction_hierarchies::CH::new(state_graph, contraction_order.into_iter());
 
     use indicatif::ProgressFinish;
     let pb = ProgressBar::new(iterations as u64)
@@ -367,7 +367,7 @@ fn generate_traces(
                 .template("{spinner:.green} [{elapsed_precise}] [{bar:40.green/blue}] {pos}/{len} traces ({percent}%) {msg}")
                 .unwrap()
         )
-        .with_message(format!("Generating traces (length {})", trace_length))
+        .with_message(format!("Generating traces (length {trace_length})"))
         .with_finish(ProgressFinish::AndLeave);
     pb.enable_steady_tick(std::time::Duration::from_millis(100));
     
@@ -402,7 +402,7 @@ fn generate_trace_file(
     if let Some(ev) = initial_event {
         events.push(ev);
     }
-    let mut next_ts: i64 = events.last().map(|e| e.ts).unwrap_or(0);
+    let mut next_ts: i64 = events.last().map_or(0, |e| e.ts);
 
     for window in walk.windows(2) {
         let u = window[0];

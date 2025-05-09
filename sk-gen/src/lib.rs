@@ -1,9 +1,9 @@
 #![deny(missing_docs, clippy::nursery, clippy::pedantic)]
 #![deny(missing_docs, clippy::private_intra_doc_links, clippy::missing_docs_in_private_items)]
 
-//! # sk-gen – Synthetic Kubernetes trace generator for SimKube
+//! # sk-gen – Synthetic Kubernetes trace generator for `SimKube`
 //!
-//! sk-gen turns one or more real SimKube traces into a probabilistic state-transition graph,
+//! sk-gen turns one or more real `SimKube` traces into a probabilistic state-transition graph,
 //! expands that graph with hypothetical actions, contracts it using Contraction Hierarchies, and
 //! finally samples random walks to produce new, realistic-looking traces.
 //!
@@ -19,7 +19,7 @@
 //!    remove low-centrality nodes while inserting shortcut edges that merge sequences of atomic
 //!    actions into single "composite" actions with combined probabilities.
 //! 4. Trace generation (`generate_traces`) – Perform weighted random walks (`walks_with_sampling`)
-//!    through the contracted graph and write each walk out as a JSON file compatible with SimKube's
+//!    through the contracted graph and write each walk out as a JSON file compatible with `SimKube`'s
 //!    `TraceStore`.
 //!
 //! The entry point [`Simulation::run`] orchestrates these stages and dumps

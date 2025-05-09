@@ -56,7 +56,7 @@ impl From<&DynamicObject> for ObjectKey {
     fn from(value: &DynamicObject) -> Self {
         let gvk = GVK::from_dynamic_obj(value).expect("dynamic object missing GVK");
         let name = value.meta().name.clone().expect("dynamic object missing name");
-        ObjectKey { name, gvk }
+        Self { name, gvk }
     }
 }
 
@@ -115,7 +115,7 @@ impl Hash for DynamicObjectNewType {
 }
 
 impl Diffable for DynamicObjectNewType {
-    type Diff<'daft> = daft::Leaf<&'daft DynamicObjectNewType>;
+    type Diff<'daft> = daft::Leaf<&'daft Self>;
 
     fn diff<'daft>(&'daft self, other: &'daft Self) -> Self::Diff<'daft> {
         daft::Leaf { before: self, after: other }

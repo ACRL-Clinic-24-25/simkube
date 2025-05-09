@@ -9,7 +9,7 @@ use petgraph::graph::{
 /// to partition the graph hierarchically and produce an efficient contraction sequence.
 /// 
 /// This helps optimize the contraction process by minimizing the number of shortcuts needed.
-pub fn nested_dissection_contraction_order<N, E>(graph: Graph<N, E>) -> Vec<NodeIndex> {
+#[must_use] pub fn nested_dissection_contraction_order<N, E>(graph: Graph<N, E>) -> Vec<NodeIndex> {
     let heuristic_graph = HeuristicGraph { graph };
     heuristic_graph.contraction_order()
 }
@@ -21,22 +21,22 @@ pub struct HeuristicGraph<N, E> {
 }
 
 impl<N, E> HeuristicGraph<N, E> {
-    /// Creates a new HeuristicGraph from an existing graph.
-    pub fn new(graph: Graph<N, E>) -> Self {
+    /// Creates a new `HeuristicGraph` from an existing graph.
+    #[must_use] pub const fn new(graph: Graph<N, E>) -> Self {
         Self { graph }
     }
 
     /// Generates a contraction order for the graph nodes.
     /// 
     /// The contraction order is the sequence in which nodes should be removed when creating the contraction hierarchy.
-    pub fn contraction_order(&self) -> Vec<NodeIndex> {
+    #[must_use] pub fn contraction_order(&self) -> Vec<NodeIndex> {
         self.generate_partition_tree(self.graph.node_indices().collect()).to_vec()
     }
 
     /// Recursively generates a partition tree for the given nodes.
     ///
     /// The partition tree represents the hierarchical decomposition of the graph, which is used to push the separator set to the end of the contraction order at each recursive level.
-    pub fn generate_partition_tree(&self, nodes: Vec<NodeIndex>) -> PartitionTreeNode {
+    #[must_use] pub fn generate_partition_tree(&self, nodes: Vec<NodeIndex>) -> PartitionTreeNode {
         if nodes.len() <= 1 {
             return PartitionTreeNode { a: None, b: None, separator: nodes };
         }

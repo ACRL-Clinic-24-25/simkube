@@ -26,7 +26,7 @@ pub struct MinScored<K, T>(pub K, pub T);
 
 impl<K: PartialOrd, T> PartialEq for MinScored<K, T> {
     #[inline]
-    fn eq(&self, other: &MinScored<K, T>) -> bool {
+    fn eq(&self, other: &Self) -> bool {
         self.cmp(other) == Ordering::Equal
     }
 }
@@ -35,14 +35,14 @@ impl<K: PartialOrd, T> Eq for MinScored<K, T> {}
 
 impl<K: PartialOrd, T> PartialOrd for MinScored<K, T> {
     #[inline]
-    fn partial_cmp(&self, other: &MinScored<K, T>) -> Option<Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
 impl<K: PartialOrd, T> Ord for MinScored<K, T> {
     #[inline]
-    fn cmp(&self, other: &MinScored<K, T>) -> Ordering {
+    fn cmp(&self, other: &Self) -> Ordering {
         let a = &self.0;
         let b = &other.0;
         if a == b {
@@ -68,7 +68,7 @@ pub struct MaxScored<K, T>(pub K, pub T);
 
 impl<K: PartialOrd, T> PartialEq for MaxScored<K, T> {
     #[inline]
-    fn eq(&self, other: &MaxScored<K, T>) -> bool {
+    fn eq(&self, other: &Self) -> bool {
         self.cmp(other) == Ordering::Equal
     }
 }
@@ -77,14 +77,14 @@ impl<K: PartialOrd, T> Eq for MaxScored<K, T> {}
 
 impl<K: PartialOrd, T> PartialOrd for MaxScored<K, T> {
     #[inline]
-    fn partial_cmp(&self, other: &MaxScored<K, T>) -> Option<Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
 impl<K: PartialOrd, T> Ord for MaxScored<K, T> {
     #[inline]
-    fn cmp(&self, other: &MaxScored<K, T>) -> Ordering {
+    fn cmp(&self, other: &Self) -> Ordering {
         let a = &self.0;
         let b = &other.0;
         if a == b {
@@ -120,8 +120,8 @@ pub struct DijkstraResult<N, K> {
 }
 
 impl<N, K> DijkstraResult<N, K> {
-    /// Creates a new DijkstraResult from distances and predecessors maps
-    pub fn new(distances: HashMap<N, K>, predecessors: HashMap<N, N>) -> Self {
+    /// Creates a new `DijkstraResult` from distances and predecessors maps
+    pub const fn new(distances: HashMap<N, K>, predecessors: HashMap<N, N>) -> Self {
         Self { distances, predecessors }
     }
 }
