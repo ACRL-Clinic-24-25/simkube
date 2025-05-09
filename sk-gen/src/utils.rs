@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::time::SystemTime;
 
 use anyhow::Result;
@@ -52,9 +52,11 @@ pub fn tracestore_from_events(events: &[TraceEvent]) -> TraceStore {
     for (ts, trace_event) in events.iter().enumerate() {
         for obj in trace_event.applied_objs.clone() {
             // ignore `maybe_old_hash` – we do not track lifecycle here
+            #[allow(clippy::cast_possible_wrap)]
             trace_store.create_or_update_obj(&obj, ts as i64, None).unwrap();
         }
         for obj in trace_event.deleted_objs.clone() {
+            #[allow(clippy::cast_possible_wrap)]
             trace_store.delete_obj(&obj, ts as i64).unwrap();
         }
     }
@@ -64,7 +66,8 @@ pub fn tracestore_from_events(events: &[TraceEvent]) -> TraceStore {
 
 /// Compute the difference between two object maps, returning new/updated (applied) and removed
 /// (deleted) objects.
-#[must_use] pub fn diff_objects<'a>(
+#[must_use]
+pub fn diff_objects<'a>(
     before: &'a std::collections::BTreeMap<ObjectKey, DynamicObjectNewType>,
     after: &'a std::collections::BTreeMap<ObjectKey, DynamicObjectNewType>,
 ) -> (Vec<DynamicObject>, Vec<DynamicObject>) {
@@ -108,7 +111,7 @@ pub fn create_timestamped_output_dir() -> Result<PathBuf> {
 
 /// Write DOT graph description to a file within `output_dir` and return the path.
 #[instrument(skip(dot_content))]
-pub fn write_dot_file(output_dir: &PathBuf, filename: &str, dot_content: &str) -> Result<PathBuf> {
+pub fn write_dot_file(output_dir: &Path, filename: &str, dot_content: &str) -> Result<PathBuf> {
     let file_path = output_dir.join(filename);
     let mut file = File::create(&file_path)?;
     write!(file, "{dot_content}")?;

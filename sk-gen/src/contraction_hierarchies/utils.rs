@@ -105,16 +105,16 @@ impl<K: PartialOrd, T> Ord for MaxScored<K, T> {
 }
 
 /// Result of the Dijkstra shortest-path algorithm.
-/// 
+///
 /// Contains the distances from the start node to each reachable node,
 /// and the predecessor mapping to reconstruct paths.
 #[derive(Debug, Clone)]
 pub struct DijkstraResult<N, K> {
     /// Mapping from node to its distance from the start node.
     pub distances: HashMap<N, K>,
-    
+
     /// Mapping from node to its predecessor in the shortest path.
-    /// 
+    ///
     /// Used to reconstruct the path from start to any node.
     pub predecessors: HashMap<N, N>,
 }

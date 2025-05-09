@@ -1,5 +1,6 @@
 //! Data models for representing cluster state and transitions.
-// TODO: it may be prefereable to implement the desired hash/eq behavior on the top-level types rather than doing the existing newtype cascade
+// TODO: it may be prefereable to implement the desired hash/eq behavior on the top-level types
+// rather than doing the existing newtype cascade
 use std::cmp::Ordering;
 use std::collections::{
     BTreeMap,
@@ -125,7 +126,8 @@ impl Diffable for DynamicObjectNewType {
 /// Cluster state (set of objects) at a specific logical timestamp.
 #[derive(Clone, Debug, Serialize)]
 pub struct Node {
-    /// Whether this state was observed in real traces input to sk-gen or synthesized during the expansion stage.
+    /// Whether this state was observed in real traces input to sk-gen or synthesized during the
+    /// expansion stage.
     pub object_type: ObjectType,
     /// Collection of Kubernetes resources present in this state.
     pub objects: BTreeMap<ObjectKey, DynamicObjectNewType>,
@@ -133,9 +135,10 @@ pub struct Node {
     pub ts: i64,
 }
 
-// TODO: this is a placeholder implementation of time which minimizes the size of the state space by simply ignoring time. We are confident that there is interesting stuff being ignored with this approach.
-// Equality & hashing ignore `ts` to avoid inflating the graph with identical states at different
-// times (time is encoded in edges).
+// TODO: this is a placeholder implementation of time which minimizes the size of the state space by
+// simply ignoring time. We are confident that there is interesting stuff being ignored with this
+// approach. Equality & hashing ignore `ts` to avoid inflating the graph with identical states at
+// different times (time is encoded in edges).
 impl PartialEq for Node {
     fn eq(&self, other: &Self) -> bool {
         self.object_type == other.object_type && self.objects == other.objects

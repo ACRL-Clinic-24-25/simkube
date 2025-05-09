@@ -12,7 +12,11 @@ use ordered_float::{
 use petgraph::graph::NodeIndex;
 use petgraph::prelude::EdgeIndex;
 use petgraph::Graph;
-use tracing::{debug, error, info};
+use tracing::{
+    debug,
+    error,
+    info,
+};
 
 use super::utils::dijkstra;
 
@@ -226,19 +230,19 @@ where
 
 use std::fmt::Debug;
 
-impl<N: Clone + Hash + Eq + Debug, E: Clone + Hash + Debug, H> CH<N, E, H>
+impl<N, E, H> CH<N, E, H>
 where
     N: Clone + Hash + Eq + Debug,
     E: Clone + Hash + Debug + Distance,
     H: ContractionHeuristic<N, E>,
 {
     /// Annotate a graph over node type `N` and edge type `E` with `CHNode` and `CHEdge` wrappers.
-    fn annotate_graph(graph: Graph<N, E>) -> Graph<CHNode<N>, CHEdge<E>> {
+    fn annotate_graph(graph: &Graph<N, E>) -> Graph<CHNode<N>, CHEdge<E>> {
         graph.map(|_, n| CHNode::new_original(n.clone()), |_, e| CHEdge::new_original(e.clone()))
     }
 
     /// Create a new contraction hierarchy from an input graph and a contraction heuristic.
-    pub fn new(graph: Graph<N, E>, heuristic: H) -> Self {
+    pub fn new(graph: &Graph<N, E>, heuristic: H) -> Self {
         let graph = Self::annotate_graph(graph);
 
         Self { graph, heuristic, num_contractions: 0 }
@@ -272,7 +276,7 @@ where
             if let Some(edge_id) = self.graph.find_edge(prev, current) {
                 path_edges.push(edge_id);
             }
-            
+
             path.push(prev);
             current = prev;
             if current == x_index {
@@ -286,11 +290,7 @@ where
         result.distances.get(&y_index).and_then(|&distance| {
             // TODO validate this use of ordered float is correct
             if distance < OrderedFloat::infinity() {
-                Some(SearchResult { 
-                    surprisal: distance,
-                    path,
-                    path_edges,
-                })
+                Some(SearchResult { surprisal: distance, path, path_edges })
             } else {
                 None
             }
@@ -305,8 +305,7 @@ where
         &self,
         x: NodeIndex,
         y: NodeIndex,
-        #[allow(unused_variables)]
-        limit: ordered_float::OrderedFloat<f64>,
+        #[allow(unused_variables)] limit: ordered_float::OrderedFloat<f64>,
     ) -> Option<SearchResult> {
         // TODO actually use limit
         self.g_distance(x, y)
@@ -314,55 +313,92 @@ where
 
     /// Contracts a node in the graph, adding necessary shortcuts to preserve distances.
     ///
-    /// This is the core operation of the contraction hierarchies algorithm. When a node is 
+    /// This is the core operation of the contraction hierarchies algorithm. When a node is
     /// contracted, it is removed from the graph and shortcuts are added between its neighbors
     /// to preserve the shortest path distances that went through the contracted node.
     fn contract(&mut self, node_index: NodeIndex) {
-        // "To compute G′, one iterates over all pairs of neighbors x, y of v increasing by distG(x, y)."
-        use petgraph::visit::EdgeRef;
-        use petgraph::Direction;
+        let (incoming_edges, outgoing_edges, in_neighbors, out_neighbors) = {
+            use petgraph::visit::EdgeRef;
+            use petgraph::Direction;
 
-        // First, collect all incident edges before we change any of them
-        let incoming_edges: Vec<_> = self
-            .graph
-            .edges_directed(node_index, Direction::Incoming)
-            .map(|edge| (edge.id(), edge.source()))
-            .collect();
+            // Collect all incident edges
+            let incoming_edges: Vec<_> = self
+                .graph
+                .edges_directed(node_index, Direction::Incoming)
+                .map(|edge| (edge.id(), edge.source()))
+                .collect();
 
-        let outgoing_edges: Vec<_> = self
-            .graph
-            .edges_directed(node_index, Direction::Outgoing)
-            .map(|edge| (edge.id(), edge.target()))
-            .collect();
+            let outgoing_edges: Vec<_> = self
+                .graph
+                .edges_directed(node_index, Direction::Outgoing)
+                .map(|edge| (edge.id(), edge.target()))
+                .collect();
 
-        let out_neighbors = self
-            .graph
-            .neighbors_directed(node_index, Direction::Outgoing)
-            .filter(|&n| !matches!(self.graph[n], CHNode::Contracted { .. }));
-        let in_neighbors = self
-            .graph
-            .neighbors_directed(node_index, Direction::Incoming)
-            .filter(|&n| !matches!(self.graph[n], CHNode::Contracted { .. }));
+            // Collect non-contracted neighbors
+            let out_neighbors: Vec<_> = self
+                .graph
+                .neighbors_directed(node_index, Direction::Outgoing)
+                .filter(|&n| !matches!(self.graph[n], CHNode::Contracted { .. }))
+                .collect();
 
+            let in_neighbors: Vec<_> = self
+                .graph
+                .neighbors_directed(node_index, Direction::Incoming)
+                .filter(|&n| !matches!(self.graph[n], CHNode::Contracted { .. }))
+                .collect();
 
-        // First collect all pairs and their original distances before contraction
-        let in_out_pairs: Vec<_> = Itertools::cartesian_product(in_neighbors, out_neighbors)
-            .map(|(x, y)| {
-                (
-                    x,
-                    y,
-                    self.g_distance(x, y)
-                        .with_context(|| {
-                            format!("Failed to compute distance between {:?} and {:?} on graph {:#?}", x, y, self.graph)
-                        })
-                        .unwrap()
-                        .surprisal,
-                )
-            })
-            .sorted_by_key(|(_, _, d)| *d)
-            .collect();
+            (incoming_edges, outgoing_edges, in_neighbors, out_neighbors)
+        };
 
-        // Now mark the node as contracted
+        let in_out_pairs: Vec<(NodeIndex, NodeIndex, OrderedFloat<f64>)> = {
+            Itertools::cartesian_product(in_neighbors.into_iter(), out_neighbors)
+                .map(|(x, y)| {
+                    (
+                        x,
+                        y,
+                        self.g_distance(x, y)
+                            .with_context(|| {
+                                format!(
+                                    "Failed to compute distance between {:?} and {:?} on graph {:#?}",
+                                    x, y, self.graph
+                                )
+                            })
+                            .unwrap()
+                            .surprisal,
+                    )
+                })
+                .sorted_by_key(|(_, _, d)| *d)
+                .collect()
+        };
+
+        self.mark_contracted(node_index, &incoming_edges, &outgoing_edges);
+
+        for (x, y, d) in in_out_pairs {
+            let search_result = self.g_distance_limited(x, y, d * 2.0);
+
+            let should_add_shortcut = match search_result.clone() {
+                Some(result) if result.surprisal <= d => false,
+                Some(_) | None => true,
+            };
+
+            if should_add_shortcut {
+                debug!("Adding shortcut from {:?} to {:?}", x, y);
+                let (path_edges, path_nodes) = self.build_shortcut_path(x, y, node_index, search_result.as_ref());
+                self.add_or_update_shortcut(x, y, path_edges, path_nodes);
+            }
+        }
+
+        self.num_contractions += 1;
+    }
+
+    /// Marks a node as contracted and its incident edges as orphaned
+    fn mark_contracted(
+        &mut self,
+        node_index: NodeIndex,
+        incoming_edges: &[(EdgeIndex, NodeIndex)],
+        outgoing_edges: &[(EdgeIndex, NodeIndex)],
+    ) {
+        // Mark the node as contracted
         match &self.graph[node_index] {
             CHNode::Original { node } => {
                 self.graph[node_index] = CHNode::Contracted {
@@ -376,129 +412,126 @@ where
         }
 
         // Mark all incident edges as orphaned
-        for (edge_id, _) in &incoming_edges {
+        for (edge_id, _) in incoming_edges {
             if let CHEdge::Original { edge } = self.graph[*edge_id].clone() {
                 self.graph[*edge_id] = CHEdge::Orphaned { edge, iteration: self.num_contractions };
             }
         }
 
-        for (edge_id, _) in &outgoing_edges {
+        for (edge_id, _) in outgoing_edges {
             if let CHEdge::Original { edge } = self.graph[*edge_id].clone() {
                 self.graph[*edge_id] = CHEdge::Orphaned { edge, iteration: self.num_contractions };
             }
         }
+    }
 
-        // witness search -- i.e. does removing v destroy the previously existing shortest path between x
-        // and y? TODO: Shortcut should probability sum over all path lengths to preserve stochastic
-        // transition probabilities       There may be a better algorithm for "find probability of
-        // all probability-weighted paths from A->C via B"
+    /// Builds a shortcut path between two nodes
+    fn build_shortcut_path(
+        &self,
+        x: NodeIndex,
+        y: NodeIndex,
+        node_index: NodeIndex,
+        search_result: Option<&SearchResult>,
+    ) -> (Vec<E>, Vec<NodeIndex>) {
+        let mut path_edges = Vec::new();
+        let path_nodes;
 
-        for (x, y, d) in in_out_pairs {
-            // TODO: We probably need to search the whole graph to avoid looking at any paths
-            let search_result = self.g_distance_limited(x, y, d * 2.0);
+        if let Some(result) = &search_result {
+            path_nodes = result.path.clone();
 
-            let should_add_shortcut = match search_result.clone() {
-                Some(result) if result.surprisal <= d => false,
-                Some(_) | None => true,
-            };
-
-            if should_add_shortcut {
-                debug!("Adding shortcut from {:?} to {:?}", x, y);
-                let mut path_edges = Vec::new();
-                let path_nodes;
-                
-                if let Some(result) = &search_result {
-                    path_nodes = result.path.clone();
-                    
-                    for &edge_idx in &result.path_edges {
-                        match &self.graph[edge_idx] {
-                            CHEdge::Original { edge } | CHEdge::Orphaned { edge, .. } => {
-                                path_edges.push(edge.clone());
-                            },
-                            CHEdge::Shortcut { edges, .. } => {
-                                // If the edge is already a shortcut, add all its component edges
-                                path_edges.extend(edges.iter().cloned());
-                            },
-                        }
-                    }
-                } else {
-                    info!("Failed to find path from {:?} to {:?}, falling back to a basic path through the contracted node", x, y);
-                    path_nodes = vec![x, node_index, y];
-                    
-                    // Find the edges forming the path through the contracted node (x -> node_index -> y)
-                    // Get edge from x to node_index
-                    if let Some(in_edge_idx) = self.graph.find_edge(x, node_index) {
-                        // Need to clone the edge weight to get its original value before potential orphaning
-                        let edge_weight = self.graph[in_edge_idx].clone();
-                        match edge_weight {
-                            CHEdge::Original { edge } | CHEdge::Orphaned { edge, .. } => {
-                                path_edges.push(edge);
-                            },
-                            CHEdge::Shortcut { edges, .. } => {
-                                // If the incoming edge is already a shortcut, use its aggregated surprisal
-                                path_edges.extend(edges); // Keep original edges if needed
-                            },
-                        }
-                    }
-
-                    if let Some(out_edge_idx) = self.graph.find_edge(node_index, y) {
-                        let edge_weight = self.graph[out_edge_idx].clone();
-                        match edge_weight {
-                            CHEdge::Original { edge } | CHEdge::Orphaned { edge, .. } => {
-                                path_edges.push(edge);
-                            },
-                            CHEdge::Shortcut { edges, .. } => {
-                                path_edges.extend(edges);
-                            },
-                        }
-                    }
+            for &edge_idx in &result.path_edges {
+                match &self.graph[edge_idx] {
+                    CHEdge::Original { edge } | CHEdge::Orphaned { edge, .. } => {
+                        path_edges.push(edge.clone());
+                    },
+                    CHEdge::Shortcut { edges, .. } => {
+                        // If the edge is already a shortcut, add all its component edges
+                        path_edges.extend(edges.iter().cloned());
+                    },
                 }
+            }
+        } else {
+            info!(
+                "Failed to find path from {:?} to {:?}, falling back to a basic path through the contracted node",
+                x, y
+            );
+            path_nodes = vec![x, node_index, y];
 
-                // Do we already have an edge x → y (that is not orphaned)?
-                if let Some(eidx) = self
-                    .graph
-                    .find_edge(x, y)
-                    .filter(|&e| !matches!(self.graph[e], CHEdge::Orphaned { .. }))
-                {
-                    if let CHEdge::Shortcut { edges, nodes, .. } = &mut self.graph[eidx] {
-                        // Update existing Shortcut
-                        *edges = path_edges;
-                        *nodes = path_nodes;
-                    } else {
-                        // Existing edge is Original - convert it to a Shortcut
-                        // Clone the original edge data before overwriting
-                        if let CHEdge::Original { .. } = self.graph[eidx].clone() {
-                            *self.graph.edge_weight_mut(eidx).unwrap() = CHEdge::Shortcut {
-                                edges: path_edges,
-                                nodes: path_nodes,
-                                iteration: self.num_contractions,
-                            };
-                        } else {
-                            error!("Found non-Original, non-Orphaned edge that wasn't a Shortcut during merge at iteration {}", self.num_contractions);
-                            // Fallback: create a new shortcut anyway? Or panic?
-                            // For now, let's overwrite with a new shortcut based on w_add
-                            *self.graph.edge_weight_mut(eidx).unwrap() = CHEdge::Shortcut {
-                                edges: path_edges,
-                                nodes: path_nodes,
-                                iteration: self.num_contractions,
-                            };
-                        }
-                    }
+            // Find the edges forming the path through the contracted node (x -> node_index -> y)
+            // Get edge from x to node_index
+            if let Some(in_edge_idx) = self.graph.find_edge(x, node_index) {
+                // Need to clone the edge weight to get its original value before potential orphaning
+                let edge_weight = self.graph[in_edge_idx].clone();
+                match edge_weight {
+                    CHEdge::Original { edge } | CHEdge::Orphaned { edge, .. } => {
+                        path_edges.push(edge);
+                    },
+                    CHEdge::Shortcut { edges, .. } => {
+                        // If the incoming edge is already a shortcut, use its aggregated surprisal
+                        path_edges.extend(edges); // Keep original edges if needed
+                    },
+                }
+            }
+
+            if let Some(out_edge_idx) = self.graph.find_edge(node_index, y) {
+                let edge_weight = self.graph[out_edge_idx].clone();
+                match edge_weight {
+                    CHEdge::Original { edge } | CHEdge::Orphaned { edge, .. } => {
+                        path_edges.push(edge);
+                    },
+                    CHEdge::Shortcut { edges, .. } => {
+                        path_edges.extend(edges);
+                    },
+                }
+            }
+        }
+
+        (path_edges, path_nodes)
+    }
+
+    /// Adds a new shortcut edge or updates an existing one between two nodes
+    fn add_or_update_shortcut(&mut self, x: NodeIndex, y: NodeIndex, path_edges: Vec<E>, path_nodes: Vec<NodeIndex>) {
+        // Check if we already have a non-orphaned edge between x and y
+        if let Some(eidx) = self
+            .graph
+            .find_edge(x, y)
+            .filter(|&e| !matches!(self.graph[e], CHEdge::Orphaned { .. }))
+        {
+            if let CHEdge::Shortcut { edges, nodes, .. } = &mut self.graph[eidx] {
+                // Update existing Shortcut
+                *edges = path_edges;
+                *nodes = path_nodes;
+            } else {
+                // Existing edge is Original - convert it to a Shortcut
+                // Clone the original edge data before overwriting
+                if let CHEdge::Original { .. } = self.graph[eidx].clone() {
+                    // The empty block in the original code is preserved here
                 } else {
-                    // --- no edge yet: create one ---
-                    self.graph.add_edge(
-                        x,
-                        y,
-                        CHEdge::Shortcut {
-                            edges: path_edges,
-                            nodes: path_nodes,
-                            iteration: self.num_contractions,
-                        },
+                    error!(
+                        "Found non-Original, non-Orphaned edge that wasn't a Shortcut during merge at iteration {}",
+                        self.num_contractions
                     );
                 }
+
+                // Overwrite with a new shortcut
+                *self.graph.edge_weight_mut(eidx).unwrap() = CHEdge::Shortcut {
+                    edges: path_edges,
+                    nodes: path_nodes,
+                    iteration: self.num_contractions,
+                };
             }
+        } else {
+            // No edge yet: create one
+            self.graph.add_edge(
+                x,
+                y,
+                CHEdge::Shortcut {
+                    edges: path_edges,
+                    nodes: path_nodes,
+                    iteration: self.num_contractions,
+                },
+            );
         }
-        self.num_contractions += 1;
     }
 
     /// Contracts the graph up to the specified iteration.
@@ -539,6 +572,10 @@ where
     ///
     /// This contracts the graph up to the specified iteration and returns
     /// a filtered version representing the state at that point.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the graph cannot be contracted to the specified iteration.
     pub fn core_graph(&mut self, i: usize) -> Result<Graph<CHNode<N>, CHEdge<E>>>
     where
         N: Clone,
@@ -576,6 +613,10 @@ where
     /// a filtered version representing the state at that point.
     ///
     /// The `progress_callback` is called after each contraction with the current iteration number.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the graph cannot be contracted to the specified iteration.
     pub fn core_graph_with_progress<F>(&mut self, i: usize, progress_callback: F) -> Result<Graph<CHNode<N>, CHEdge<E>>>
     where
         N: Clone,
@@ -615,19 +656,19 @@ where
     /// with all shortcuts added during the contraction process. This method contracts
     /// all nodes in the graph based on the heuristic and returns a filtered version
     /// with original node representation.
-    pub fn contraction_hierarchy(&mut self) -> Result<Graph<CHNode<N>, CHEdge<E>>> {
+    pub fn contraction_hierarchy(&mut self) -> Graph<CHNode<N>, CHEdge<E>> {
         while let Some(next_contraction) = self.heuristic.next_contraction(&self.graph) {
             self.contract(next_contraction);
         }
 
-        Ok(self.graph.filter_map(
+        self.graph.filter_map(
             |_, n| match n {
                 CHNode::Original { node } | CHNode::Contracted { node, .. } => {
                     Some(CHNode::Original { node: node.clone() })
                 },
             },
             |_, e| Some(e.clone()), // Include all edges, including orphaned edges
-        ))
+        )
     }
 }
 
@@ -637,8 +678,8 @@ where
 /// in a graph with edge weights that implement the `Distance` trait.
 pub trait GraphDistance<E: Distance> {
     /// Returns the probability of traversing a single edge in the graph.
-    fn edge_probability(&self, edge_idx: &EdgeIndex) -> OrderedFloat<f64>;
-    
+    fn edge_probability(&self, edge_idx: EdgeIndex) -> OrderedFloat<f64>;
+
     /// Returns the probability of traversing a sequence of edges in the graph.
     ///
     /// The probability of a path is the product of the probabilities of its edges.
@@ -648,11 +689,11 @@ pub trait GraphDistance<E: Distance> {
 
 // implement GraphDistance for any Graph with edge weights implementing Distance
 impl<N, E: Distance> GraphDistance<E> for Graph<N, E> {
-    fn edge_probability(&self, edge_idx: &EdgeIndex) -> OrderedFloat<f64> {
-        self.edge_weight(*edge_idx).expect("Edge index should be valid").probability()
+    fn edge_probability(&self, edge_idx: EdgeIndex) -> OrderedFloat<f64> {
+        self.edge_weight(edge_idx).expect("Edge index should be valid").probability()
     }
 
     fn path_probability(&self, edge_indices: &[EdgeIndex]) -> OrderedFloat<f64> {
-        edge_indices.iter().map(|&idx| self.edge_probability(&idx)).product()
+        edge_indices.iter().map(|&idx| self.edge_probability(idx)).product()
     }
 }

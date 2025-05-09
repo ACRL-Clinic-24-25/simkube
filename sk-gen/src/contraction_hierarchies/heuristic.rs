@@ -5,38 +5,26 @@ use petgraph::graph::{
     NodeIndex,
 };
 
-/// Generates a contraction order for the given graph using nested dissection
-/// to partition the graph hierarchically and produce an efficient contraction sequence.
-/// 
-/// This helps optimize the contraction process by minimizing the number of shortcuts needed.
-#[must_use] pub fn nested_dissection_contraction_order<N, E>(graph: Graph<N, E>) -> Vec<NodeIndex> {
-    let heuristic_graph = HeuristicGraph { graph };
-    heuristic_graph.contraction_order()
-}
-
-/// A graph wrapper that provides heuristic functions for contraction hierarchies.
-pub struct HeuristicGraph<N, E> {
-    /// The underlying graph data structure.
-    pub graph: Graph<N, E>,
-}
-
-impl<N, E> HeuristicGraph<N, E> {
-    /// Creates a new `HeuristicGraph` from an existing graph.
-    #[must_use] pub const fn new(graph: Graph<N, E>) -> Self {
-        Self { graph }
-    }
-
-    /// Generates a contraction order for the graph nodes.
-    /// 
-    /// The contraction order is the sequence in which nodes should be removed when creating the contraction hierarchy.
-    #[must_use] pub fn contraction_order(&self) -> Vec<NodeIndex> {
-        self.generate_partition_tree(self.graph.node_indices().collect()).to_vec()
-    }
+/// A trait providing contraction hierarchy functionality for graphs.
+pub trait NestedDissection<N, E> {
+    /// Generates a contraction order for the graph nodes using nested dissection.
+    ///
+    /// This helps optimize the contraction process by minimizing the number of shortcuts needed.
+    fn contraction_order(&self) -> Vec<NodeIndex>;
 
     /// Recursively generates a partition tree for the given nodes.
     ///
-    /// The partition tree represents the hierarchical decomposition of the graph, which is used to push the separator set to the end of the contraction order at each recursive level.
-    #[must_use] pub fn generate_partition_tree(&self, nodes: Vec<NodeIndex>) -> PartitionTreeNode {
+    /// The partition tree represents the hierarchical decomposition of the graph, which is used
+    /// to push the separator set to the end of the contraction order at each recursive level.
+    fn partition_tree(&self, nodes: Vec<NodeIndex>) -> PartitionTreeNode;
+}
+
+impl<N, E> NestedDissection<N, E> for Graph<N, E> {
+    fn contraction_order(&self) -> Vec<NodeIndex> {
+        self.partition_tree(self.node_indices().collect()).to_vec()
+    }
+
+    fn partition_tree(&self, nodes: Vec<NodeIndex>) -> PartitionTreeNode {
         if nodes.len() <= 1 {
             return PartitionTreeNode { a: None, b: None, separator: nodes };
         }
@@ -49,16 +37,15 @@ impl<N, E> HeuristicGraph<N, E> {
         }
 
         // METIS input: CSR for the `nodes` induced subgraph.
-
         let mut xadj = Vec::with_capacity(nodes.len() + 1);
         let mut adjncy = Vec::new();
         let mut current_idx = 0;
         xadj.push(current_idx);
         for &node in &nodes {
-            for neighbor in self.graph.neighbors(node) {
+            for neighbor in self.neighbors(node) {
                 if nodes.contains(&neighbor) {
                     let metis_idx = node_to_metis[&neighbor];
-                    adjncy.push(metis_idx as metis::Idx);
+                    adjncy.push(metis::Idx::try_from(metis_idx).unwrap());
                     current_idx += 1;
                 }
             }
@@ -91,17 +78,9 @@ impl<N, E> HeuristicGraph<N, E> {
             b = right.to_vec();
         }
 
-        let a_tree = if a.is_empty() {
-            None
-        } else {
-            Some(Box::new(self.generate_partition_tree(a)))
-        };
+        let a_tree = if a.is_empty() { None } else { Some(Box::new(self.partition_tree(a))) };
 
-        let b_tree = if b.is_empty() {
-            None
-        } else {
-            Some(Box::new(self.generate_partition_tree(b)))
-        };
+        let b_tree = if b.is_empty() { None } else { Some(Box::new(self.partition_tree(b))) };
 
         let separator = Vec::new();
 
@@ -110,7 +89,7 @@ impl<N, E> HeuristicGraph<N, E> {
 }
 
 /// A tree structure representing the hierarchical partitioning of a graph.
-/// 
+///
 /// Used as part of the nested dissection algorithm to generate contraction orders.
 #[derive(Debug)]
 pub struct PartitionTreeNode {
